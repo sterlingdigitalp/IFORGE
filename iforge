@@ -1,0 +1,389 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHARACTERS_DIR="$ROOT/characters"
+BOARD="$ROOT/PRODUCTION_BOARD.md"
+MAX_ITERATIONS=5
+STATES=(Research Ready Generating Review Approved)
+
+usage() {
+  cat <<'USAGE'
+Identity Forge Phase 1 helper
+
+Commands:
+  ./iforge new "Name" [reference_image]
+  ./iforge validate character_slug
+  ./iforge prompt character_slug
+  ./iforge launch character_slug
+  ./iforge generated character_slug image_path
+  ./iforge approve character_slug [image_path]
+  ./iforge status character_slug Research|Ready|Generating|Review|Approved
+  ./iforge board
+
+Philosophy:
+  Maximum five iterations. Approve. Move forward.
+USAGE
+}
+
+slugify() {
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/_/g; s/^_+//; s/_+$//'
+}
+
+is_state() {
+  local value="$1"
+  local state
+  for state in "${STATES[@]}"; do
+    [[ "$state" == "$value" ]] && return 0
+  done
+  return 1
+}
+
+character_dir() {
+  printf '%s/%s' "$CHARACTERS_DIR" "$1"
+}
+
+status_file() {
+  printf '%s/STATUS.md' "$(character_dir "$1")"
+}
+
+field() {
+  local file="$1"
+  local key="$2"
+  [[ -f "$file" ]] || return 0
+  local line
+  line="$(grep -E "^${key}:" "$file" | head -n 1 || true)"
+  [[ -n "$line" ]] || return 0
+  printf '%s' "${line#*: }"
+}
+
+ensure_character() {
+  local slug="$1"
+  local dir
+  dir="$(character_dir "$slug")"
+  [[ -d "$dir" ]] || { echo "Missing character: $slug" >&2; exit 1; }
+}
+
+write_status() {
+  local slug="$1"
+  local name="$2"
+  local status="$3"
+  local iterations="$4"
+  local reference="$5"
+  local approved="$6"
+  local dir
+  dir="$(character_dir "$slug")"
+  mkdir -p "$dir"
+  cat > "$dir/STATUS.md" <<EOF_STATUS
+# $name Status
+
+Character: $name
+Slug: $slug
+Status: $status
+Iterations: $iterations
+Reference: $reference
+Prompt: prompt.md
+Approved Image: $approved
+Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+EOF_STATUS
+}
+
+update_status() {
+  local slug="$1"
+  local new_status="$2"
+  ensure_character "$slug"
+  is_state "$new_status" || { echo "Invalid status: $new_status" >&2; exit 1; }
+
+  local file name iterations reference approved
+  file="$(status_file "$slug")"
+  name="$(field "$file" Character)"
+  iterations="$(field "$file" Iterations)"
+  reference="$(field "$file" Reference)"
+  approved="$(field "$file" 'Approved Image')"
+
+  [[ -n "$name" ]] || name="$slug"
+  [[ -n "$iterations" ]] || iterations="0"
+
+  write_status "$slug" "$name" "$new_status" "$iterations" "$reference" "$approved"
+  regenerate_board
+}
+
+valid_image_ext() {
+  local ext
+  ext="$(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]')"
+  [[ "$ext" == "jpg" || "$ext" == "jpeg" || "$ext" == "png" || "$ext" == "webp" ]]
+}
+
+first_reference() {
+  local slug="$1"
+  local dir
+  dir="$(character_dir "$slug")/references"
+  local file
+  for file in "$dir"/*; do
+    [[ -f "$file" ]] || continue
+    valid_image_ext "$file" && [[ -s "$file" ]] && printf '%s' "$file" && return 0
+  done
+  return 1
+}
+
+validate_reference() {
+  local slug="$1"
+  ensure_character "$slug"
+  if first_reference "$slug" >/dev/null; then
+    echo "PASS - reference loaded for $slug"
+    local current
+    current="$(field "$(status_file "$slug")" Status)"
+    [[ "$current" == "Research" ]] && update_status "$slug" Ready
+    return 0
+  fi
+  echo "FAIL - no valid reference image found for $slug" >&2
+  echo "Add a .jpg, .jpeg, .png, or .webp file to characters/$slug/references/" >&2
+  return 1
+}
+
+regenerate_board() {
+  mkdir -p "$CHARACTERS_DIR"
+  {
+    echo "# Production Board"
+    echo
+    local state file slug name status found
+    for state in "${STATES[@]}"; do
+      echo "## $state"
+      found=0
+      for file in "$CHARACTERS_DIR"/*/STATUS.md; do
+        [[ -f "$file" ]] || continue
+        status="$(field "$file" Status)"
+        [[ "$status" == "$state" ]] || continue
+        name="$(field "$file" Character)"
+        slug="$(field "$file" Slug)"
+        echo "- $name ($slug)"
+        found=1
+      done
+      [[ "$found" == "0" ]] && echo "-"
+      echo
+    done
+  } > "$BOARD"
+}
+
+new_character() {
+  [[ $# -ge 1 ]] || { usage; exit 1; }
+  local name="$1"
+  local source_ref="${2:-}"
+  local slug dir status reference ext dest
+  slug="$(slugify "$name")"
+  [[ -n "$slug" ]] || { echo "Could not create slug from name." >&2; exit 1; }
+  dir="$(character_dir "$slug")"
+  mkdir -p "$dir/references" "$dir/generated" "$dir/approved"
+
+  status="Research"
+  reference=""
+  if [[ -n "$source_ref" ]]; then
+    [[ -f "$source_ref" ]] || { echo "Reference image not found: $source_ref" >&2; exit 1; }
+    valid_image_ext "$source_ref" || { echo "Unsupported reference type: $source_ref" >&2; exit 1; }
+    ext="$(printf '%s' "${source_ref##*.}" | tr '[:upper:]' '[:lower:]')"
+    dest="$dir/references/ref_01.$ext"
+    cp "$source_ref" "$dest"
+    reference="references/ref_01.$ext"
+    status="Ready"
+  fi
+
+  cat > "$dir/REFERENCE.md" <<EOF_REFERENCE
+# $name Reference
+
+Builder A handoff.
+
+Reference loaded: $reference
+
+Identity notes:
+
+Historical caution notes:
+EOF_REFERENCE
+
+  cat > "$dir/REVIEW.md" <<EOF_REVIEW
+# $name Review
+
+Builder C review.
+
+Identity preserved:
+
+Style belongs to Identity Forge:
+
+Emotional signature reads clearly:
+
+Artifacts removed:
+
+Decision:
+EOF_REVIEW
+
+  cat > "$dir/APPROVAL.md" <<EOF_APPROVAL
+# $name Approval
+
+Approved: no
+
+Approved image:
+
+Approval notes:
+EOF_APPROVAL
+
+  cat > "$dir/prompt.md" <<EOF_PROMPT
+# $name Prompt
+
+Run:
+
+./iforge prompt $slug
+EOF_PROMPT
+
+  write_status "$slug" "$name" "$status" "0" "$reference" ""
+  regenerate_board
+  echo "Created characters/$slug"
+  echo "Status: $status"
+}
+
+generate_prompt() {
+  local slug="$1"
+  ensure_character "$slug"
+  validate_reference "$slug" >/dev/null
+
+  local file name ref_list dir
+  dir="$(character_dir "$slug")"
+  file="$(status_file "$slug")"
+  name="$(field "$file" Character)"
+  ref_list="$(cd "$dir" && printf '%s\n' references/* 2>/dev/null || true)"
+
+  cat > "$dir/prompt.md" <<EOF_PROMPT
+# $name Prompt
+
+Use the attached reference image as the primary identity source.
+
+Reference files:
+$ref_list
+
+Create the first canonical Identity Forge character image for $name.
+
+Preserve the recognizable facial structure, age, posture, cultural context, and historical identity from the reference.
+
+Remove source artifacts: engraving lines, painting texture, paper grain, cracks, sepia aging, black-and-white limitations, museum lighting, and medium-specific distortion.
+
+Render as a full-color cinematic animated character in the Identity Forge universe: historically grounded, emotionally specific, child-appealing, tactile, expressive, and production-ready.
+
+The character must have a distinct emotional signature, not a generic friendly expression. Preserve the person's individuality while keeping the image appropriate for children.
+
+Use cinematic readable lighting, realistic skin and material texture, period-specific clothing, meaningful environment, shallow depth of field, and clear silhouette.
+
+Avoid caricature, parody, modern fashion, fantasy costume, toy plastic colors, hyperreal uncanny skin, anime proportions, and generic cartoon styling.
+
+Maximum five iterations. If identity is preserved and the image belongs to the cast, approve and move forward.
+EOF_PROMPT
+
+  update_status "$slug" Ready
+  echo "Generated characters/$slug/prompt.md"
+}
+
+launch_character() {
+  local slug="$1"
+  ensure_character "$slug"
+  local prompt
+  prompt="$(character_dir "$slug")/prompt.md"
+  [[ -f "$prompt" ]] || { echo "Missing prompt. Run: ./iforge prompt $slug" >&2; exit 1; }
+  if command -v pbcopy >/dev/null 2>&1; then
+    pbcopy < "$prompt"
+    echo "Prompt copied to clipboard."
+  fi
+  update_status "$slug" Generating
+  if command -v node >/dev/null 2>&1; then
+    node "$ROOT/playwright-launch.js" "$slug"
+  else
+    echo "Node not found. Opening ChatGPT in the default browser."
+    open "https://chatgpt.com" >/dev/null 2>&1 || true
+  fi
+}
+
+record_generated() {
+  local slug="$1"
+  local image="$2"
+  ensure_character "$slug"
+  [[ -f "$image" ]] || { echo "Generated image not found: $image" >&2; exit 1; }
+  valid_image_ext "$image" || { echo "Unsupported image type: $image" >&2; exit 1; }
+
+  local file iterations next ext dest
+  file="$(status_file "$slug")"
+  iterations="$(field "$file" Iterations)"
+  [[ -n "$iterations" ]] || iterations="0"
+  next=$((iterations + 1))
+  if (( next > MAX_ITERATIONS )); then
+    echo "Max five iterations reached. Approve or move on." >&2
+    exit 1
+  fi
+  ext="$(printf '%s' "${image##*.}" | tr '[:upper:]' '[:lower:]')"
+  dest="$(character_dir "$slug")/generated/iteration_$(printf '%02d' "$next").$ext"
+  cp "$image" "$dest"
+
+  local name reference approved
+  name="$(field "$file" Character)"
+  reference="$(field "$file" Reference)"
+  approved="$(field "$file" 'Approved Image')"
+  write_status "$slug" "$name" Review "$next" "$reference" "$approved"
+  regenerate_board
+  echo "Recorded $dest"
+  echo "Status: Review"
+}
+
+approve_character() {
+  local slug="$1"
+  local image="${2:-}"
+  ensure_character "$slug"
+  local dir
+  dir="$(character_dir "$slug")"
+  if [[ -z "$image" ]]; then
+    local generated=("$dir"/generated/*)
+    [[ ${#generated[@]} -gt 0 ]] || { echo "No generated image found. Provide an image path." >&2; exit 1; }
+    local last_index=$(( ${#generated[@]} - 1 ))
+    image="${generated[$last_index]}"
+  fi
+  [[ -f "$image" ]] || { echo "Approval image not found: $image" >&2; exit 1; }
+  valid_image_ext "$image" || { echo "Unsupported image type: $image" >&2; exit 1; }
+
+  local ext dest file name iterations reference
+  ext="$(printf '%s' "${image##*.}" | tr '[:upper:]' '[:lower:]')"
+  dest="$dir/approved/canonical.$ext"
+  cp "$image" "$dest"
+  file="$(status_file "$slug")"
+  name="$(field "$file" Character)"
+  iterations="$(field "$file" Iterations)"
+  reference="$(field "$file" Reference)"
+
+  cat > "$dir/APPROVAL.md" <<EOF_APPROVAL
+# $name Approval
+
+Approved: yes
+
+Approved image: approved/canonical.$ext
+
+Approval notes: Identity preserved. Production can move forward.
+
+Approved at: $(date '+%Y-%m-%d %H:%M:%S')
+EOF_APPROVAL
+
+  write_status "$slug" "$name" Approved "$iterations" "$reference" "approved/canonical.$ext"
+  regenerate_board
+  echo "Approved $name"
+}
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+  new) new_character "$@" ;;
+  validate) [[ $# -eq 1 ]] || { usage; exit 1; }; validate_reference "$1" ;;
+  prompt) [[ $# -eq 1 ]] || { usage; exit 1; }; generate_prompt "$1" ;;
+  launch) [[ $# -eq 1 ]] || { usage; exit 1; }; launch_character "$1" ;;
+  generated) [[ $# -eq 2 ]] || { usage; exit 1; }; record_generated "$1" "$2" ;;
+  approve) [[ $# -ge 1 && $# -le 2 ]] || { usage; exit 1; }; approve_character "$@" ;;
+  status) [[ $# -eq 2 ]] || { usage; exit 1; }; update_status "$1" "$2" ;;
+  board) regenerate_board; echo "Updated PRODUCTION_BOARD.md" ;;
+  ""|-h|--help|help) usage ;;
+  *) usage; exit 1 ;;
+esac

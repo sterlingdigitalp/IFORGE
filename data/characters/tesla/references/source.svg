@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#ddd7cf"/>
+  <rect x="180" y="150" width="540" height="820" fill="#f5f1ea" stroke="#766f67" stroke-width="10"/>
+  <ellipse cx="450" cy="435" rx="135" ry="195" fill="#cab8a6"/>
+  <path d="M310 320c75-110 205-120 280-10-70-32-185-30-280 10z" fill="#2d2926"/>
+  <circle cx="405" cy="425" r="16" fill="#2a2724"/>
+  <circle cx="500" cy="425" r="16" fill="#2a2724"/>
+  <path d="M400 540c35 20 75 20 110 0" fill="none" stroke="#3b312b" stroke-width="10" stroke-linecap="round"/>
+  <path d="M280 750h340v230H280z" fill="#202833"/>
+  <text x="450" y="1080" text-anchor="middle" font-family="Arial" font-size="56" font-weight="700" fill="#39332d">Tesla Reference</text>
+</svg>

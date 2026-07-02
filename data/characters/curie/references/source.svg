@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#e2ded7"/>
+  <rect x="175" y="155" width="550" height="830" fill="#f5f1ec" stroke="#81766b" stroke-width="10"/>
+  <ellipse cx="450" cy="450" rx="145" ry="180" fill="#cdb9a5"/>
+  <path d="M305 340c60-105 230-115 290 0-75-50-215-50-290 0z" fill="#5f584f"/>
+  <circle cx="400" cy="438" r="15" fill="#292622"/>
+  <circle cx="500" cy="438" r="15" fill="#292622"/>
+  <path d="M390 555c38 16 82 16 120 0" fill="none" stroke="#44382f" stroke-width="9" stroke-linecap="round"/>
+  <path d="M270 755h360v230H270z" fill="#3f4650"/>
+  <text x="450" y="1080" text-anchor="middle" font-family="Arial" font-size="56" font-weight="700" fill="#3a352f">Curie Reference</text>
+</svg>

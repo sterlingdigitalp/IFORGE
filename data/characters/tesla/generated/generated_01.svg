@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#f8f5f0"/>
+  <ellipse cx="450" cy="450" rx="150" ry="210" fill="#d9bda2"/>
+  <path d="M300 320c85-115 215-125 300 0-88-40-215-40-300 0z" fill="#252423"/>
+  <circle cx="402" cy="430" r="18" fill="#201f1e"/>
+  <circle cx="502" cy="430" r="18" fill="#201f1e"/>
+  <path d="M400 565c38 24 86 24 124 0" fill="none" stroke="#5d352d" stroke-width="10" stroke-linecap="round"/>
+  <path d="M260 760c92-92 288-92 380 0v285H260z" fill="#1f2935"/>
+  <path d="M370 760l80 180 80-180" fill="#f0ece6"/>
+  <text x="450" y="1110" text-anchor="middle" font-family="Arial" font-size="54" font-weight="700" fill="#262321">Generated Candidate</text>
+</svg>

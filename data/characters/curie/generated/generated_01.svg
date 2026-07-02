@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#faf7f2"/>
+  <ellipse cx="450" cy="455" rx="155" ry="195" fill="#d9bfa9"/>
+  <path d="M285 350c75-125 255-130 330 0-85-58-245-58-330 0z" fill="#6a6258"/>
+  <path d="M325 370c30 75 30 150 0 230" fill="none" stroke="#6a6258" stroke-width="32" stroke-linecap="round"/>
+  <path d="M575 370c-30 75-30 150 0 230" fill="none" stroke="#6a6258" stroke-width="32" stroke-linecap="round"/>
+  <circle cx="398" cy="435" r="17" fill="#242321"/>
+  <circle cx="502" cy="435" r="17" fill="#242321"/>
+  <path d="M390 568c40 18 80 18 120 0" fill="none" stroke="#573a31" stroke-width="9" stroke-linecap="round"/>
+  <path d="M255 770c88-80 302-80 390 0v270H255z" fill="#414a55"/>
+  <text x="450" y="1110" text-anchor="middle" font-family="Arial" font-size="54" font-weight="700" fill="#272521">Generated Candidate</text>
+</svg>

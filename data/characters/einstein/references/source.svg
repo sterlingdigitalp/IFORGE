@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#e5ded4"/>
+  <rect x="165" y="170" width="570" height="790" fill="#f4efe8" stroke="#8d8275" stroke-width="10"/>
+  <circle cx="450" cy="420" r="170" fill="#d0c2b1"/>
+  <path d="M265 340c70-150 305-155 370 0-55-35-110-48-185-48s-130 13-185 48z" fill="#f7f4ef"/>
+  <path d="M285 280c70-125 260-135 330 0-70-42-260-42-330 0z" fill="#fffdf8"/>
+  <circle cx="385" cy="420" r="18" fill="#423a32"/>
+  <circle cx="515" cy="420" r="18" fill="#423a32"/>
+  <path d="M360 515c45 28 135 28 180 0" fill="none" stroke="#423a32" stroke-width="14" stroke-linecap="round"/>
+  <path d="M340 500c70-35 150-35 220 0" fill="none" stroke="#f7f4ef" stroke-width="38" stroke-linecap="round"/>
+  <path d="M255 730c75-90 315-90 390 0v230H255z" fill="#3d4550"/>
+  <text x="450" y="1080" text-anchor="middle" font-family="Arial" font-size="56" font-weight="700" fill="#4a433c">Einstein Reference</text>
+</svg>

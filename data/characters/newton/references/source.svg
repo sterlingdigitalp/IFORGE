@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+  <rect width="900" height="1200" fill="#e4ded4"/>
+  <rect x="165" y="150" width="570" height="840" fill="#f5f0e8" stroke="#887b6c" stroke-width="10"/>
+  <ellipse cx="450" cy="460" rx="135" ry="205" fill="#cbb7a2"/>
+  <path d="M290 315c70-125 250-135 320 0-90-55-230-55-320 0z" fill="#efe9df"/>
+  <path d="M285 360c-30 90-30 200 0 315" fill="none" stroke="#efe9df" stroke-width="44" stroke-linecap="round"/>
+  <path d="M615 360c30 90 30 200 0 315" fill="none" stroke="#efe9df" stroke-width="44" stroke-linecap="round"/>
+  <circle cx="405" cy="455" r="15" fill="#302b26"/>
+  <circle cx="495" cy="455" r="15" fill="#302b26"/>
+  <path d="M395 575c35 18 75 18 110 0" fill="none" stroke="#4a382d" stroke-width="9" stroke-linecap="round"/>
+  <path d="M250 780h400v215H250z" fill="#4b3d32"/>
+  <text x="450" y="1080" text-anchor="middle" font-family="Arial" font-size="56" font-weight="700" fill="#403930">Newton Reference</text>
+</svg>
