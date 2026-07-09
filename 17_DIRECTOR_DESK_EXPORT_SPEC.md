@@ -1,8 +1,16 @@
 # 17_DIRECTOR_DESK_EXPORT_SPEC.md
 
 Version: 1.0  
-Status: Foundation Specification  
+Status: V2 Target — superseded for Phase 1  
 Project: Identity Forge (IFORGE)
+
+> **Phase 1 supersession notice.** The live IFORGE → Director Desk interface is
+> Director Desk's `CANONICAL_IMAGE_CONTRACT.md`: one canonical image plus a JSON
+> sidecar, delivered by HTTP POST to Director Desk's ingestion API, validated on
+> arrival. This document remains the V2 package target (manifests, dossiers,
+> expressions, turnarounds, checksums); the image-level contract will be embedded
+> within it when the package format is implemented. Until then, where the two
+> documents differ, the canonical image contract governs.
 
 ---
 
