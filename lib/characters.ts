@@ -1,7 +1,9 @@
 import { promises as fs } from "fs";
 import crypto from "crypto";
 import path from "path";
-import { validateForCanonicalLock } from "@/lib/canonical-image";
+import { preflightCanonicalImage, validateForCanonicalLock } from "@/lib/canonical-image";
+
+const packageJson = require("../package.json") as { version: string };
 
 export type CharacterRecord = {
   id: string;
@@ -57,6 +59,10 @@ type BatchCandidateMetadata = {
   source?: string;
 };
 
+type ApprovalMetadata = {
+  image?: string;
+};
+
 const DATA_ROOT = path.join(process.cwd(), "data", "characters");
 const PROJECT_ROOT = process.cwd();
 const LOOP_CHARACTERS_ROOT = path.join(PROJECT_ROOT, "characters");
@@ -92,6 +98,25 @@ async function firstImage(folder: string) {
   return image ? path.join(folder, image) : null;
 }
 
+async function canonicalImage(folder: string) {
+  const approval = await readJson<ApprovalMetadata>(path.join(folder, "approval.json"), {});
+  if (approval.image && path.basename(approval.image) === approval.image) {
+    const approvedImage = path.join(folder, approval.image);
+    if (IMAGE_EXTENSIONS.has(path.extname(approvedImage).toLowerCase()) && (await pathExists(approvedImage))) {
+      return approvedImage;
+    }
+  }
+  return firstImage(folder);
+}
+
+async function writeImmutable(filePath: string, contents: Buffer | string) {
+  try {
+    await fs.writeFile(filePath, contents, { flag: "wx" });
+  } catch (error) {
+    if (!(error instanceof Error) || !("code" in error) || error.code !== "EEXIST") throw error;
+  }
+}
+
 function fileUrl(filePath: string | null) {
   if (!filePath) return null;
   const relative = path.relative(DATA_ROOT, filePath).split(path.sep).map(encodeURIComponent).join("/");
@@ -125,7 +150,7 @@ export async function listCharacters(): Promise<CharacterRecord[]> {
         const meta = await readJson<CharacterMeta>(path.join(root, "character.json"), {});
         const reference = await firstImage(path.join(root, "references"));
         const generated = await firstImage(path.join(root, "generated"));
-        const canonical = await firstImage(path.join(root, "canonical"));
+        const canonical = await canonicalImage(path.join(root, "canonical"));
         const prompt = meta.prompt ?? "";
 
         return {
@@ -192,18 +217,54 @@ export async function approveCharacter(id: string) {
     throw new Error(`Canonical image rejected: ${errors.join("; ")}`);
   }
 
+  const facePreflight = await preflightCanonicalImage(imageBytes, path.basename(generated), process.env.DIRECTORDESK_URL);
+  if (facePreflight.errors.length > 0) {
+    throw new Error(`Canonical image rejected: ${facePreflight.errors.join("; ")}`);
+  }
+  const approvalWarnings = [...warnings, ...facePreflight.warnings];
+
   const canonicalDir = path.join(root, "canonical");
   await fs.mkdir(canonicalDir, { recursive: true });
-  const destination = path.join(canonicalDir, `canonical${path.extname(generated)}`);
-  await fs.copyFile(generated, destination);
+  const canonicalSha256 = crypto.createHash("sha256").update(imageBytes).digest("hex");
+  const canonicalFilename = `canonical-${canonicalSha256.slice(0, 12)}${path.extname(generated)}`;
+  const destination = path.join(canonicalDir, canonicalFilename);
+  await writeImmutable(destination, imageBytes);
+
+  const metrics = facePreflight.metrics;
+  const metricValues = metrics
+    ? ["det_score", "bbox_height_frac", "yaw_deg"]
+        .filter((key) => metrics[key] !== undefined)
+        .map((key) => `${key}=${String(metrics[key])}`)
+    : [];
+  const metricsSummary = metricValues.length > 0 ? ` (${metricValues.join(", ")})` : "";
+  const provenance = `Approved in Identity Forge from prompt version ${activePromptVersion}; generated image ${path.basename(generated)}; face pre-flight ${facePreflight.status}${metricsSummary}`;
+  await writeImmutable(
+    `${destination}.canonical.json`,
+    JSON.stringify(
+      {
+        schema_version: "canonical_image.v1",
+        character_name: meta.name ?? id,
+        version: canonicalSha256,
+        created_by: { app: "identity-forge", version: packageJson.version },
+        provenance,
+        license: "TODO: usage rights not yet designated"
+      },
+      null,
+      2
+    )
+  );
   await fs.writeFile(path.join(canonicalDir, "winning_prompt.md"), prompt);
+  const { errors: _preflightErrors, ...facePreflightForApproval } = facePreflight;
   await fs.writeFile(
     path.join(canonicalDir, "approval.json"),
     JSON.stringify(
       {
-        image: path.basename(destination),
+        image: canonicalFilename,
+        canonicalSha256,
         promptVersion: activePromptVersion,
-        approvedAt: new Date().toISOString()
+        approvedAt: new Date().toISOString(),
+        facePreflight: facePreflightForApproval,
+        warnings: approvalWarnings
       },
       null,
       2
@@ -221,7 +282,7 @@ export async function approveCharacter(id: string) {
       2
     )
   );
-  return { character: await getCharacter(id), warnings };
+  return { character: await getCharacter(id), warnings: approvalWarnings };
 }
 
 export async function writeCharacterImage(id: string, target: "references" | "generated", file: File) {
