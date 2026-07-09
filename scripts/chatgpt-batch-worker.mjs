@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import { promises as fs } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+const require = createRequire(import.meta.url);
+const { validateCanonicalImage } = require("./shared-canonical-image.js");
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const CHARACTERS_DIR = path.join(ROOT, "data", "characters");
@@ -232,6 +235,19 @@ async function saveCheckpointDiagnostics(page, detection, failedSelectorOrCondit
   return savePageDiagnostics(page, detection, failedSelectorOrCondition, "chatgpt-cloudflare");
 }
 
+async function saveRejectedCapture(bytes, round, validation, captureMethod) {
+  const diagnosticsPath = path.join(DEBUG_DIR, `chatgpt-capture-${safeTimestamp()}`);
+  await fs.mkdir(diagnosticsPath, { recursive: true });
+  await fs.writeFile(path.join(diagnosticsPath, `rejected-${round}.png`), bytes);
+  await writeJson(path.join(diagnosticsPath, "validation.json"), {
+    savedAt: nowIso(),
+    round,
+    captureMethod,
+    ...validation
+  });
+  return diagnosticsPath;
+}
+
 async function findScheduleFiles(characterFilter) {
   if (!(await exists(CHARACTERS_DIR))) return [];
   const characters = await fs.readdir(CHARACTERS_DIR, { withFileTypes: true });
@@ -372,8 +388,7 @@ async function waitForGeneratedImage(page, previousSources) {
   throw new Error("Timed out waiting for generated image.");
 }
 
-async function downloadImage(page, image, destinationPath) {
-  await fs.mkdir(path.dirname(destinationPath), { recursive: true });
+async function downloadImage(page, image) {
   try {
     const bytes = await page.evaluate(async (src) => {
       const response = await fetch(src);
@@ -382,9 +397,10 @@ async function downloadImage(page, image, destinationPath) {
       return Array.from(new Uint8Array(buffer));
     }, image.src);
 
-    await fs.writeFile(destinationPath, Buffer.from(bytes));
+    return { bytes: Buffer.from(bytes), captureMethod: "download" };
   } catch {
-    await page.locator("img").nth(image.index).screenshot({ path: destinationPath });
+    const bytes = await page.locator("img").nth(image.index).screenshot();
+    return { bytes, captureMethod: "screenshot" };
   }
 }
 
@@ -428,10 +444,10 @@ async function processRound(context, schedulePath, schedule, round, options) {
   const outputPath = absoluteBatchPath(schedulePath, round.generatedImagePath);
   const promptPath = outputPath.replace(/\.[^.]+$/, ".prompt.md");
   const metadataPath = outputPath.replace(/\.[^.]+$/, ".json");
+  let capture;
 
   if (options.dryRun) {
-    await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.writeFile(outputPath, `DRY RUN IMAGE PLACEHOLDER\n${round.prompt}\n`);
+    capture = { bytes: Buffer.from(`DRY RUN IMAGE PLACEHOLDER\n${round.prompt}\n`), captureMethod: null };
   } else {
     const page = await openChatGptPage(context, options);
     const before = new Set((await imageSnapshot(page)).map((image) => image.src));
@@ -439,11 +455,13 @@ async function processRound(context, schedulePath, schedule, round, options) {
     await fillComposer(page, round.prompt);
     await submitPrompt(page);
     const generatedImage = await waitForGeneratedImage(page, before);
-    await downloadImage(page, generatedImage, outputPath);
+    capture = await downloadImage(page, generatedImage);
   }
 
-  await fs.writeFile(promptPath, round.prompt);
-  await writeJson(metadataPath, {
+  const validation = options.dryRun
+    ? { errors: [], warnings: [] }
+    : validateCanonicalImage(capture.bytes, path.basename(outputPath));
+  const metadata = {
     characterId: schedule.characterId,
     batchId: schedule.id,
     round: round.round,
@@ -451,8 +469,39 @@ async function processRound(context, schedulePath, schedule, round, options) {
     promptVersion: round.promptVersion,
     referenceImages: schedule.referenceImages,
     generatedImagePath: round.generatedImagePath,
+    source: options.dryRun ? "dry-run" : "chatgpt-web",
+    captureMethod: capture.captureMethod
+  };
+
+  if (validation.errors.length > 0) {
+    await fs.rm(outputPath, { force: true });
+    const diagnosticsPath = await saveRejectedCapture(capture.bytes, round.round, validation, capture.captureMethod);
+    await fs.mkdir(path.dirname(metadataPath), { recursive: true });
+    await fs.writeFile(promptPath, round.prompt);
+    await writeJson(metadataPath, {
+      ...metadata,
+      failedAt: nowIso(),
+      validationErrors: validation.errors,
+      warnings: validation.warnings,
+      diagnosticsPath
+    });
+
+    const error = new Error(`Generated image rejected: ${validation.errors.join("; ")}`);
+    error.validationErrors = validation.errors;
+    error.validationWarnings = validation.warnings;
+    error.captureMethod = capture.captureMethod;
+    error.diagnosticsPath = diagnosticsPath;
+    error.metadataPath = path.relative(characterRoot(schedulePath), metadataPath);
+    throw error;
+  }
+
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, capture.bytes);
+  await fs.writeFile(promptPath, round.prompt);
+  await writeJson(metadataPath, {
+    ...metadata,
     savedAt: nowIso(),
-    source: options.dryRun ? "dry-run" : "chatgpt-web"
+    warnings: validation.warnings
   });
 
   await markRound(schedulePath, schedule, roundIndex, {
@@ -460,7 +509,9 @@ async function processRound(context, schedulePath, schedule, round, options) {
     savedAt: nowIso(),
     generatedImagePath: round.generatedImagePath,
     promptPath: path.relative(characterRoot(schedulePath), promptPath),
-    metadataPath: path.relative(characterRoot(schedulePath), metadataPath)
+    metadataPath: path.relative(characterRoot(schedulePath), metadataPath),
+    warnings: validation.warnings,
+    captureMethod: capture.captureMethod
   });
 }
 
@@ -546,13 +597,21 @@ async function runOnce(options) {
         const roundIndex = latest.rounds.findIndex((round) => round.round === currentRound.round);
         const isCheckpoint = error && typeof error === "object" && error.code === "checkpoint_required";
         if (roundIndex !== -1) {
-          await markRound(item.schedulePath, latest, roundIndex, {
+          const updates = {
             status: isCheckpoint ? "checkpoint_required" : "failed",
             error: error instanceof Error ? error.message : String(error),
             failedAt: isCheckpoint ? null : nowIso(),
             checkpointRequiredAt: isCheckpoint ? nowIso() : latest.rounds[roundIndex].checkpointRequiredAt,
             diagnosticsPath: isCheckpoint ? error.diagnosticsPath : latest.rounds[roundIndex].diagnosticsPath
-          });
+          };
+          if (!isCheckpoint && error && typeof error === "object" && Array.isArray(error.validationErrors)) {
+            updates.validationErrors = error.validationErrors;
+            updates.warnings = error.validationWarnings;
+            updates.captureMethod = error.captureMethod;
+            updates.diagnosticsPath = error.diagnosticsPath;
+            updates.metadataPath = error.metadataPath;
+          }
+          await markRound(item.schedulePath, latest, roundIndex, updates);
         }
         throw error;
       }

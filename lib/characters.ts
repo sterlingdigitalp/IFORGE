@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import crypto from "crypto";
 import path from "path";
+import { validateForCanonicalLock } from "@/lib/canonical-image";
 
 export type CharacterRecord = {
   id: string;
@@ -185,6 +186,12 @@ export async function approveCharacter(id: string) {
     throw new Error("Generated image was not ingested from the active prompt version.");
   }
 
+  const imageBytes = await fs.readFile(generated);
+  const { errors, warnings } = validateForCanonicalLock(imageBytes, path.basename(generated));
+  if (errors.length > 0) {
+    throw new Error(`Canonical image rejected: ${errors.join("; ")}`);
+  }
+
   const canonicalDir = path.join(root, "canonical");
   await fs.mkdir(canonicalDir, { recursive: true });
   const destination = path.join(canonicalDir, `canonical${path.extname(generated)}`);
@@ -214,7 +221,7 @@ export async function approveCharacter(id: string) {
       2
     )
   );
-  return getCharacter(id);
+  return { character: await getCharacter(id), warnings };
 }
 
 export async function writeCharacterImage(id: string, target: "references" | "generated", file: File) {

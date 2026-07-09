@@ -71,6 +71,8 @@ export default function Home() {
   const [scheduleStart, setScheduleStart] = useState("");
   const [schedulePrompts, setSchedulePrompts] = useState(["", "", "", "", "", ""]);
   const [scheduleMessage, setScheduleMessage] = useState("");
+  const [approvalError, setApprovalError] = useState("");
+  const [approvalWarnings, setApprovalWarnings] = useState<string[]>([]);
   const sourceInput = useRef<HTMLInputElement>(null);
   const resultInput = useRef<HTMLInputElement>(null);
   const scheduleRef1 = useRef<HTMLInputElement>(null);
@@ -105,6 +107,11 @@ export default function Home() {
     setPrompt(selected?.prompt ?? "");
     setNotes(selected?.notes ?? "");
   }, [selected?.id, selected?.notes, selected?.prompt]);
+
+  useEffect(() => {
+    setApprovalError("");
+    setApprovalWarnings([]);
+  }, [selected?.id]);
 
   useEffect(() => {
     let active = true;
@@ -188,17 +195,23 @@ export default function Home() {
 
   async function approve() {
     if (!selected) return;
+    setApprovalError("");
+    setApprovalWarnings([]);
     setBusy(true);
-    await saveText();
-    const response = await fetch(`/api/characters/${selected.id}/approve`, { method: "POST" });
-    const data = (await response.json()) as { character?: Character };
-        if (data.character) {
-      const nextCharacters = characters.map((character) =>
-        character.id === selected.id ? data.character! : character
-      );
-      setCharacters(nextCharacters);
+    try {
+      await saveText();
+      const response = await fetch(`/api/characters/${selected.id}/approve`, { method: "POST" });
+      const data = (await response.json()) as { character?: Character; error?: string; warnings?: string[] };
+
+      if (!response.ok || data.error) {
+        setApprovalError(data.error ?? `Approval failed (${response.status}).`);
+      } else if (data.character) {
+        updateCharacter(data.character);
+        setApprovalWarnings(data.warnings ?? []);
+      }
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
   }
 
   async function scheduleBatch() {
@@ -407,6 +420,16 @@ export default function Home() {
           >
             Lock Image + Active Prompt
           </button>
+          {approvalError ? (
+            <div className="mt-3 border border-[#6c4b22] bg-[#1c1409] p-3 text-xs font-black uppercase leading-5 text-[#f2b35e]">
+              {approvalError}
+            </div>
+          ) : null}
+          {approvalWarnings.length > 0 ? (
+            <div className="mt-3 border border-[#6c4b22] bg-[#1c1409] p-3 text-xs font-black uppercase leading-5 text-[#f2b35e]">
+              {approvalWarnings.join("; ")}
+            </div>
+          ) : null}
           <button
             type="button"
             onClick={() => {

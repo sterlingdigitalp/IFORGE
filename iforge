@@ -644,6 +644,11 @@ approve_character() {
 
   mkdir -p "$dir/approved" "$dir/prompts"
   copy_as_png "$image" "$dir/canonical.png"
+  if ! node "$ROOT/scripts/validate-canonical.mjs" "$dir/canonical.png" --strict-canonical; then
+    rm -f "$dir/canonical.png"
+    echo "Approval aborted: canonical image validation failed." >&2
+    exit 1
+  fi
   cp "$dir/canonical.png" "$dir/approved/canonical.png"
   cp "$dir/$prompt" "$dir/prompts/winning_prompt.md"
   winning_rel="prompts/winning.json"
