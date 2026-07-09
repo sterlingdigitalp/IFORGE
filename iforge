@@ -5,24 +5,32 @@ shopt -s nullglob
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHARACTERS_DIR="$ROOT/characters"
 BOARD="$ROOT/PRODUCTION_BOARD.md"
+LOOP_STATE="$ROOT/LOOP_STATE.md"
+CURRENT_FILE="$ROOT/.iforge_current"
 MAX_ITERATIONS=5
-STATES=(Research Ready Generating Review Approved)
+STATES=(imported prompt_generated launched generated review approved)
 
 usage() {
   cat <<'USAGE'
-Identity Forge Phase 1 helper
+Identity Forge loop switchboard
 
 Commands:
-  ./iforge new "Name" [reference_image]
-  ./iforge validate character_slug
-  ./iforge prompt character_slug
-  ./iforge launch character_slug
-  ./iforge generated character_slug image_path
-  ./iforge approve character_slug [image_path]
-  ./iforge status character_slug Research|Ready|Generating|Review|Approved
-  ./iforge board
+  ./iforge import "Name" reference_image
+  ./iforge generate [character_slug]
+  ./iforge launch [character_slug]
+  ./iforge ingest image_path [character_slug]
+  ./iforge promote batch_output_path [character_slug]
+  ./iforge approve [character_slug]
+  ./iforge next
+
+Descriptions:
+  promote  Promote a selected batch candidate to the active generated image for comparison and approval.
+
+Loop:
+  imported -> prompt_generated -> launched -> generated -> review -> approved
 
 Philosophy:
+  Image 2 explores. The worker collects. PROMOTE is human selection. APPROVE is identity lock.
   Maximum five iterations. Approve. Move forward.
 USAGE
 }
@@ -42,12 +50,92 @@ is_state() {
   return 1
 }
 
+valid_image_ext() {
+  local ext
+  ext="$(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]')"
+  [[ "$ext" == "jpg" || "$ext" == "jpeg" || "$ext" == "png" || "$ext" == "webp" ]]
+}
+
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+json_field() {
+  node -e 'const data = JSON.parse(process.argv[1]); const promoted = data.promoted || data; process.stdout.write(String(promoted[process.argv[2]] ?? ""));' "$1" "$2"
+}
+
+json_file_field() {
+  [[ -f "$1" ]] || return 0
+  node -e 'const fs = require("fs"); const data = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); process.stdout.write(String(data[process.argv[2]] ?? ""));' "$1" "$2" 2>/dev/null || true
+}
+
+prompt_version_from_path() {
+  local prompt="$1"
+  [[ -n "$prompt" ]] || return 0
+  basename "$prompt" .md
+}
+
+copy_as_png() {
+  local source="$1"
+  local dest="$2"
+  local ext
+  ext="$(printf '%s' "${source##*.}" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$ext" == "png" ]]; then
+    cp "$source" "$dest"
+    return 0
+  fi
+  if command -v sips >/dev/null 2>&1; then
+    sips -s format png "$source" --out "$dest" >/dev/null 2>&1 && return 0
+  fi
+  cp "$source" "$dest"
+}
+
+promote_endpoint() {
+  local slug="$1"
+  local template="${IFORGE_PROMOTE_ENDPOINT:-}"
+  if [[ -n "$template" ]]; then
+    printf '%s' "${template//\{id\}/$slug}"
+    return 0
+  fi
+
+  local base="${IFORGE_BUILDER_A_URL:-http://127.0.0.1:3000}"
+  base="${base%/}"
+  printf '%s/api/character/%s/promote' "$base" "$slug"
+}
+
+call_promote_endpoint() {
+  local endpoint="$1"
+  local image="$2"
+  node - "$endpoint" "$image" <<'NODE'
+const [endpoint, batchOutputPath] = process.argv.slice(2);
+
+(async () => {
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ batchOutputPath })
+    });
+    const body = await response.text();
+    if (!response.ok) {
+      console.error(body || `Builder A promote endpoint failed with status ${response.status}.`);
+      process.exit(1);
+    }
+    process.stdout.write(body);
+  } catch (error) {
+    console.error(`Could not reach Builder A promote endpoint ${endpoint}: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+})();
+NODE
+}
+
 character_dir() {
   printf '%s/%s' "$CHARACTERS_DIR" "$1"
 }
 
-status_file() {
-  printf '%s/STATUS.md' "$(character_dir "$1")"
+state_file() {
+  printf '%s/STATE.md' "$(character_dir "$1")"
 }
 
 field() {
@@ -60,88 +148,170 @@ field() {
   printf '%s' "${line#*: }"
 }
 
+current_slug() {
+  [[ -f "$CURRENT_FILE" ]] || return 1
+  local slug
+  slug="$(tr -d '[:space:]' < "$CURRENT_FILE")"
+  [[ -n "$slug" ]] || return 1
+  printf '%s' "$slug"
+}
+
+resolve_slug() {
+  local provided="${1:-}"
+  if [[ -n "$provided" ]]; then
+    printf '%s' "$provided"
+    return 0
+  fi
+  current_slug || { echo "No current character. Run: ./iforge import \"Name\" reference_image" >&2; exit 1; }
+}
+
 ensure_character() {
   local slug="$1"
-  local dir
-  dir="$(character_dir "$slug")"
-  [[ -d "$dir" ]] || { echo "Missing character: $slug" >&2; exit 1; }
+  [[ -d "$(character_dir "$slug")" ]] || { echo "Missing character: $slug" >&2; exit 1; }
 }
 
-write_status() {
+set_current() {
   local slug="$1"
-  local name="$2"
-  local status="$3"
-  local iterations="$4"
-  local reference="$5"
-  local approved="$6"
-  local dir
-  dir="$(character_dir "$slug")"
-  mkdir -p "$dir"
-  cat > "$dir/STATUS.md" <<EOF_STATUS
-# $name Status
-
-Character: $name
-Slug: $slug
-Status: $status
-Iterations: $iterations
-Reference: $reference
-Prompt: prompt.md
-Approved Image: $approved
-Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
-EOF_STATUS
+  printf '%s\n' "$slug" > "$CURRENT_FILE"
 }
 
-update_status() {
+append_event() {
   local slug="$1"
-  local new_status="$2"
-  ensure_character "$slug"
-  is_state "$new_status" || { echo "Invalid status: $new_status" >&2; exit 1; }
+  local event="$2"
+  local dir
+  dir="$(character_dir "$slug")"
+  printf '%s - %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$event" >> "$dir/EVENTS.log"
+}
 
-  local file name iterations reference approved
-  file="$(status_file "$slug")"
+write_state() {
+  local slug="$1"
+  local state="$2"
+  is_state "$state" || { echo "Invalid state: $state" >&2; exit 1; }
+
+  local dir file name iterations reference prompt prompt_version generated approved winning
+  dir="$(character_dir "$slug")"
+  file="$dir/STATE.md"
   name="$(field "$file" Character)"
   iterations="$(field "$file" Iterations)"
   reference="$(field "$file" Reference)"
+  prompt="$(field "$file" Prompt)"
+  prompt_version="$(field "$file" 'Prompt Version')"
+  generated="$(field "$file" 'Generated Image')"
   approved="$(field "$file" 'Approved Image')"
+  winning="$(field "$file" 'Winning Prompt')"
 
   [[ -n "$name" ]] || name="$slug"
   [[ -n "$iterations" ]] || iterations="0"
+  [[ -n "$prompt_version" ]] || prompt_version="$(prompt_version_from_path "$prompt")"
 
-  write_status "$slug" "$name" "$new_status" "$iterations" "$reference" "$approved"
+  cat > "$file" <<EOF_STATE
+# $name Loop State
+
+Character: $name
+Slug: $slug
+State: $state
+Iterations: $iterations
+Reference: $reference
+Prompt: $prompt
+Prompt Version: $prompt_version
+Generated Image: $generated
+Approved Image: $approved
+Winning Prompt: $winning
+Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+EOF_STATE
+
+  append_event "$slug" "state -> $state"
+  set_current "$slug"
+  write_loop_state "$slug" "$state"
   regenerate_board
 }
 
-valid_image_ext() {
-  local ext
-  ext="$(printf '%s' "${1##*.}" | tr '[:upper:]' '[:lower:]')"
-  [[ "$ext" == "jpg" || "$ext" == "jpeg" || "$ext" == "png" || "$ext" == "webp" ]]
-}
+write_loop_state() {
+  local slug="${1:-}"
+  local state="${2:-import}"
+  local next="./iforge import \"Name\" reference_image"
+  local current="none"
+  local prompt="none"
+  local generated="none"
+  local canonical="none"
+  local winning="none"
 
-first_reference() {
-  local slug="$1"
-  local dir
-  dir="$(character_dir "$slug")/references"
-  local file
-  for file in "$dir"/*; do
-    [[ -f "$file" ]] || continue
-    valid_image_ext "$file" && [[ -s "$file" ]] && printf '%s' "$file" && return 0
-  done
-  return 1
-}
-
-validate_reference() {
-  local slug="$1"
-  ensure_character "$slug"
-  if first_reference "$slug" >/dev/null; then
-    echo "PASS - reference loaded for $slug"
-    local current
-    current="$(field "$(status_file "$slug")" Status)"
-    [[ "$current" == "Research" ]] && update_status "$slug" Ready
-    return 0
+  if [[ -n "$slug" ]]; then
+    current="$slug"
+    local file
+    file="$(state_file "$slug")"
+    prompt="$(field "$file" Prompt)"
+    generated="$(field "$file" 'Generated Image')"
+    canonical="$(field "$file" 'Approved Image')"
+    winning="$(field "$file" 'Winning Prompt')"
+    [[ -n "$prompt" ]] || prompt="none"
+    [[ -n "$generated" ]] || generated="none"
+    [[ -n "$canonical" ]] || canonical="none"
+    [[ -n "$winning" ]] || winning="none"
+    case "$state" in
+      imported) next="./iforge generate" ;;
+      prompt_generated) next="./iforge launch" ;;
+      launched) next="./iforge promote batch_output_path" ;;
+      generated|review) next="./iforge approve" ;;
+      approved) next="./iforge next" ;;
+    esac
   fi
-  echo "FAIL - no valid reference image found for $slug" >&2
-  echo "Add a .jpg, .jpeg, .png, or .webp file to characters/$slug/references/" >&2
-  return 1
+
+  cat > "$LOOP_STATE" <<EOF_LOOP
+# Loop State
+
+Current Character: $current
+State: $state
+Active Prompt: $prompt
+Generated Image: $generated
+Canonical Image: $canonical
+Winning Prompt: $winning
+Next Command: $next
+Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+
+Preferred Workflow: IMPORT -> GENERATE PROMPT -> LAUNCH IMAGE 2 -> WORKER SAVES BATCH -> PROMOTE SELECTED CANDIDATE -> COMPARE -> APPROVE -> CANONICAL
+PROMOTE: human selection; elevates one batch exploration into the active generated candidate.
+APPROVE: identity lock; permanently saves the active generated candidate as canonical.
+Manual Fallback: ./iforge ingest image_path remains available when no batch worker output exists.
+EOF_LOOP
+}
+
+write_character_state() {
+  local slug="$1"
+  local name="$2"
+  local state="$3"
+  local iterations="$4"
+  local reference="$5"
+  local prompt="$6"
+  local generated="$7"
+  local approved="$8"
+  local winning="${9:-}"
+  local prompt_version_override="${10:-}"
+  local dir
+  local prompt_version
+  dir="$(character_dir "$slug")"
+  prompt_version="$prompt_version_override"
+  [[ -n "$prompt_version" ]] || prompt_version="$(prompt_version_from_path "$prompt")"
+  mkdir -p "$dir"
+  cat > "$dir/STATE.md" <<EOF_STATE
+# $name Loop State
+
+Character: $name
+Slug: $slug
+State: $state
+Iterations: $iterations
+Reference: $reference
+Prompt: $prompt
+Prompt Version: $prompt_version
+Generated Image: $generated
+Approved Image: $approved
+Winning Prompt: $winning
+Last Updated: $(date '+%Y-%m-%d %H:%M:%S')
+EOF_STATE
+  append_event "$slug" "state -> $state"
+  set_current "$slug"
+  write_loop_state "$slug" "$state"
+  regenerate_board
 }
 
 regenerate_board() {
@@ -149,13 +319,17 @@ regenerate_board() {
   {
     echo "# Production Board"
     echo
+    echo "Preferred Workflow: IMPORT -> GENERATE PROMPT -> LAUNCH IMAGE 2 -> WORKER SAVES BATCH -> PROMOTE SELECTED CANDIDATE -> COMPARE -> APPROVE -> CANONICAL"
+    echo
+    echo "PROMOTE is human selection. APPROVE is identity lock. Manual ingest remains available for fallback workflows."
+    echo
     local state file slug name status found
     for state in "${STATES[@]}"; do
       echo "## $state"
       found=0
-      for file in "$CHARACTERS_DIR"/*/STATUS.md; do
+      for file in "$CHARACTERS_DIR"/*/STATE.md; do
         [[ -f "$file" ]] || continue
-        status="$(field "$file" Status)"
+        status="$(field "$file" State)"
         [[ "$status" == "$state" ]] || continue
         name="$(field "$file" Character)"
         slug="$(field "$file" Slug)"
@@ -168,98 +342,88 @@ regenerate_board() {
   } > "$BOARD"
 }
 
-new_character() {
-  [[ $# -ge 1 ]] || { usage; exit 1; }
+first_reference() {
+  local slug="$1"
+  local dir file
+  dir="$(character_dir "$slug")/references"
+  for file in "$dir"/*; do
+    [[ -f "$file" ]] || continue
+    valid_image_ext "$file" && [[ -s "$file" ]] && printf '%s' "$file" && return 0
+  done
+  return 1
+}
+
+import_character() {
+  [[ $# -eq 2 ]] || { usage; exit 1; }
   local name="$1"
-  local source_ref="${2:-}"
-  local slug dir status reference ext dest
+  local source_ref="$2"
+  [[ -f "$source_ref" ]] || { echo "Reference image not found: $source_ref" >&2; exit 1; }
+  valid_image_ext "$source_ref" || { echo "Unsupported reference type: $source_ref" >&2; exit 1; }
+
+  local slug dir ext dest
   slug="$(slugify "$name")"
   [[ -n "$slug" ]] || { echo "Could not create slug from name." >&2; exit 1; }
   dir="$(character_dir "$slug")"
-  mkdir -p "$dir/references" "$dir/generated" "$dir/approved"
+  mkdir -p "$dir/references" "$dir/generated" "$dir/approved" "$dir/prompts"
 
-  status="Research"
-  reference=""
-  if [[ -n "$source_ref" ]]; then
-    [[ -f "$source_ref" ]] || { echo "Reference image not found: $source_ref" >&2; exit 1; }
-    valid_image_ext "$source_ref" || { echo "Unsupported reference type: $source_ref" >&2; exit 1; }
-    ext="$(printf '%s' "${source_ref##*.}" | tr '[:upper:]' '[:lower:]')"
-    dest="$dir/references/ref_01.$ext"
-    cp "$source_ref" "$dest"
-    reference="references/ref_01.$ext"
-    status="Ready"
-  fi
+  ext="$(printf '%s' "${source_ref##*.}" | tr '[:upper:]' '[:lower:]')"
+  dest="$dir/references/reference.$ext"
+  cp "$source_ref" "$dest"
 
-  cat > "$dir/REFERENCE.md" <<EOF_REFERENCE
-# $name Reference
+  cat > "$dir/IMPORT.md" <<EOF_IMPORT
+# $name Import
 
-Builder A handoff.
+Reference: references/reference.$ext
+Builder A Notes:
+Historical Cautions:
+EOF_IMPORT
 
-Reference loaded: $reference
+  cat > "$dir/COMPARE.md" <<EOF_COMPARE
+# $name Compare
 
-Identity notes:
+- [ ] Identity preserved
+- [ ] Source artifacts removed
+- [ ] Emotional signature reads clearly
+- [ ] Fits Identity Forge cast
+- [ ] Approve or iterate
+EOF_COMPARE
 
-Historical caution notes:
-EOF_REFERENCE
-
-  cat > "$dir/REVIEW.md" <<EOF_REVIEW
-# $name Review
-
-Builder C review.
-
-Identity preserved:
-
-Style belongs to Identity Forge:
-
-Emotional signature reads clearly:
-
-Artifacts removed:
-
-Decision:
-EOF_REVIEW
-
-  cat > "$dir/APPROVAL.md" <<EOF_APPROVAL
-# $name Approval
-
-Approved: no
-
-Approved image:
-
-Approval notes:
-EOF_APPROVAL
-
-  cat > "$dir/prompt.md" <<EOF_PROMPT
-# $name Prompt
-
-Run:
-
-./iforge prompt $slug
-EOF_PROMPT
-
-  write_status "$slug" "$name" "$status" "0" "$reference" ""
-  regenerate_board
-  echo "Created characters/$slug"
-  echo "Status: $status"
+  write_character_state "$slug" "$name" imported "0" "references/reference.$ext" "" "" ""
+  echo "imported: $name ($slug)"
+  echo "next: ./iforge generate"
 }
 
 generate_prompt() {
-  local slug="$1"
+  local slug
+  slug="$(resolve_slug "${1:-}")"
   ensure_character "$slug"
-  validate_reference "$slug" >/dev/null
+  first_reference "$slug" >/dev/null || { echo "No valid reference for $slug" >&2; exit 1; }
 
-  local file name ref_list dir
+  local dir file name reference iterations generated approved winning prompt_count prompt_file prompt_path prompt_rel
   dir="$(character_dir "$slug")"
-  file="$(status_file "$slug")"
+  file="$(state_file "$slug")"
   name="$(field "$file" Character)"
-  ref_list="$(cd "$dir" && printf '%s\n' references/* 2>/dev/null || true)"
+  reference="$(field "$file" Reference)"
+  iterations="$(field "$file" Iterations)"
+  generated="$(field "$file" 'Generated Image')"
+  approved="$(field "$file" 'Approved Image')"
+  winning="$(field "$file" 'Winning Prompt')"
+  [[ -n "$iterations" ]] || iterations="0"
+  mkdir -p "$dir/prompts"
+  local existing=("$dir"/prompts/prompt_*.md)
+  prompt_count=$(( ${#existing[@]} + 1 ))
+  prompt_file="prompt_$(printf '%02d' "$prompt_count").md"
+  prompt_rel="prompts/$prompt_file"
+  prompt_path="$dir/$prompt_rel"
 
-  cat > "$dir/prompt.md" <<EOF_PROMPT
-# $name Prompt
+  cat > "$prompt_path" <<EOF_PROMPT
+# $name Generation Prompt
+
+Prompt Version: $(basename "$prompt_file" .md)
 
 Use the attached reference image as the primary identity source.
 
-Reference files:
-$ref_list
+Reference: $reference
 
 Create the first canonical Identity Forge character image for $name.
 
@@ -269,47 +433,71 @@ Remove source artifacts: engraving lines, painting texture, paper grain, cracks,
 
 Render as a full-color cinematic animated character in the Identity Forge universe: historically grounded, emotionally specific, child-appealing, tactile, expressive, and production-ready.
 
-The character must have a distinct emotional signature, not a generic friendly expression. Preserve the person's individuality while keeping the image appropriate for children.
+The character must have a distinct emotional signature, not a generic friendly expression.
 
 Use cinematic readable lighting, realistic skin and material texture, period-specific clothing, meaningful environment, shallow depth of field, and clear silhouette.
 
 Avoid caricature, parody, modern fashion, fantasy costume, toy plastic colors, hyperreal uncanny skin, anime proportions, and generic cartoon styling.
 
-Maximum five iterations. If identity is preserved and the image belongs to the cast, approve and move forward.
+Maximum five iterations. Approve and move forward.
 EOF_PROMPT
 
-  update_status "$slug" Ready
-  echo "Generated characters/$slug/prompt.md"
+  cp "$prompt_path" "$dir/prompt.md"
+
+  write_character_state "$slug" "$name" prompt_generated "$iterations" "$reference" "$prompt_rel" "$generated" "$approved" "$winning"
+  echo "prompt_generated: characters/$slug/$prompt_rel"
+  echo "next: ./iforge launch"
 }
 
 launch_character() {
-  local slug="$1"
+  local slug
+  slug="$(resolve_slug "${1:-}")"
   ensure_character "$slug"
-  local prompt
-  prompt="$(character_dir "$slug")/prompt.md"
-  [[ -f "$prompt" ]] || { echo "Missing prompt. Run: ./iforge prompt $slug" >&2; exit 1; }
+
+  local dir prompt prompt_rel ref name
+  dir="$(character_dir "$slug")"
+  prompt_rel="$(field "$(state_file "$slug")" Prompt)"
+  [[ -n "$prompt_rel" ]] || prompt_rel="prompt.md"
+  prompt="$dir/$prompt_rel"
+  [[ -f "$prompt" ]] || { echo "Missing prompt. Run: ./iforge generate" >&2; exit 1; }
+  ref="$(field "$(state_file "$slug")" Reference)"
+  name="$(field "$(state_file "$slug")" Character)"
+
   if command -v pbcopy >/dev/null 2>&1; then
     pbcopy < "$prompt"
-    echo "Prompt copied to clipboard."
   fi
-  update_status "$slug" Generating
-  if command -v node >/dev/null 2>&1; then
-    node "$ROOT/playwright-launch.js" "$slug"
-  else
-    echo "Node not found. Opening ChatGPT in the default browser."
-    open "https://chatgpt.com" >/dev/null 2>&1 || true
-  fi
+
+  cat > "$dir/LAUNCH.md" <<EOF_LAUNCH
+# $name Launch
+
+Reference: $ref
+Prompt: $prompt_rel
+
+Operator:
+1. Use Image 2 or the unattended worker with the active prompt.
+2. Let the worker save the batch candidates.
+3. Choose one candidate.
+4. Run ./iforge promote batch_output_path.
+5. Use ./iforge ingest image_path only for manual fallback work.
+EOF_LAUNCH
+
+  write_state "$slug" launched
+  echo "launched: $name"
+  echo "prompt copied if clipboard is available"
+  echo "next: ./iforge promote batch_output_path"
 }
 
-record_generated() {
-  local slug="$1"
-  local image="$2"
+ingest_image() {
+  [[ $# -ge 1 && $# -le 2 ]] || { usage; exit 1; }
+  local image="$1"
+  local slug
+  slug="$(resolve_slug "${2:-}")"
   ensure_character "$slug"
   [[ -f "$image" ]] || { echo "Generated image not found: $image" >&2; exit 1; }
   valid_image_ext "$image" || { echo "Unsupported image type: $image" >&2; exit 1; }
 
-  local file iterations next ext dest
-  file="$(status_file "$slug")"
+  local file iterations next ext dest name reference prompt prompt_version approved metadata_rel
+  file="$(state_file "$slug")"
   iterations="$(field "$file" Iterations)"
   [[ -n "$iterations" ]] || iterations="0"
   next=$((iterations + 1))
@@ -317,73 +505,204 @@ record_generated() {
     echo "Max five iterations reached. Approve or move on." >&2
     exit 1
   fi
+
   ext="$(printf '%s' "${image##*.}" | tr '[:upper:]' '[:lower:]')"
   dest="$(character_dir "$slug")/generated/iteration_$(printf '%02d' "$next").$ext"
   cp "$image" "$dest"
 
-  local name reference approved
+  name="$(field "$file" Character)"
+  reference="$(field "$file" Reference)"
+  prompt="$(field "$file" Prompt)"
+  prompt_version="$(field "$file" 'Prompt Version')"
+  approved="$(field "$file" 'Approved Image')"
+  [[ -n "$prompt" ]] || { echo "No active prompt. Run: ./iforge generate" >&2; exit 1; }
+  [[ -n "$prompt_version" ]] || prompt_version="$(prompt_version_from_path "$prompt")"
+  write_character_state "$slug" "$name" generated "$next" "$reference" "$prompt" "generated/$(basename "$dest")" "$approved"
+
+  metadata_rel="generated/iteration_$(printf '%02d' "$next").json"
+  cat > "$(character_dir "$slug")/$metadata_rel" <<EOF_METADATA
+{
+  "character": "$(json_escape "$name")",
+  "state": "generated",
+  "iteration": $next,
+  "image": "generated/$(json_escape "$(basename "$dest")")",
+  "prompt_version": "$(json_escape "$prompt_version")",
+  "prompt": "$(json_escape "$prompt")",
+  "ingested_at": "$(date '+%Y-%m-%d %H:%M:%S')"
+}
+EOF_METADATA
+
+  cat > "$(character_dir "$slug")/COMPARE.md" <<EOF_COMPARE
+# $name Compare
+
+Generated Image: generated/$(basename "$dest")
+Prompt: $prompt
+Prompt Version: $prompt_version
+Iteration: $next/$MAX_ITERATIONS
+
+- [ ] Identity preserved
+- [ ] Source artifacts removed
+- [ ] Emotional signature reads clearly
+- [ ] Fits Identity Forge cast
+- [ ] Approve or iterate
+
+Decision:
+EOF_COMPARE
+
+  write_character_state "$slug" "$name" review "$next" "$reference" "$prompt" "generated/$(basename "$dest")" "$approved"
+  echo "ingested: $dest"
+  echo "state: review"
+  echo "next: ./iforge approve"
+}
+
+promote_candidate() {
+  [[ $# -ge 1 && $# -le 2 ]] || { usage; exit 1; }
+  local image="$1"
+  local slug
+  slug="$(resolve_slug "${2:-}")"
+  ensure_character "$slug"
+  [[ -f "$image" ]] || { echo "Batch output image not found: $image" >&2; exit 1; }
+  valid_image_ext "$image" || { echo "Unsupported batch output type: $image" >&2; exit 1; }
+
+  local endpoint response prompt_rel prompt_version generated_rel metadata_rel source_rel
+  endpoint="$(promote_endpoint "$slug")"
+  response="$(call_promote_endpoint "$endpoint" "$image")"
+  prompt_rel="$(json_field "$response" promptPath)"
+  prompt_version="$(json_field "$response" promptVersion)"
+  generated_rel="$(json_field "$response" generatedImage)"
+  metadata_rel="$(json_field "$response" metadataPath)"
+  source_rel="$(json_field "$response" promotedFrom)"
+
+  [[ -n "$prompt_rel" && -n "$prompt_version" && -n "$generated_rel" ]] || { echo "Builder A promote response was missing prompt lineage." >&2; exit 1; }
+
+  local file iterations next name reference approved
+  file="$(state_file "$slug")"
+  iterations="$(field "$file" Iterations)"
+  [[ -n "$iterations" ]] || iterations="0"
+  next=$((iterations + 1))
+  if (( next > MAX_ITERATIONS )); then
+    echo "Max five iterations reached. Approve or move on." >&2
+    exit 1
+  fi
+
   name="$(field "$file" Character)"
   reference="$(field "$file" Reference)"
   approved="$(field "$file" 'Approved Image')"
-  write_status "$slug" "$name" Review "$next" "$reference" "$approved"
-  regenerate_board
-  echo "Recorded $dest"
-  echo "Status: Review"
+
+  write_character_state "$slug" "$name" generated "$next" "$reference" "$prompt_rel" "$generated_rel" "$approved" "" "$prompt_version"
+
+  cat > "$(character_dir "$slug")/COMPARE.md" <<EOF_COMPARE
+# $name Compare
+
+Promoted Candidate: $generated_rel
+Prompt: $prompt_rel
+Prompt Version: $prompt_version
+Batch Source: $source_rel
+Batch Metadata: $metadata_rel
+Iteration: $next/$MAX_ITERATIONS
+
+- [ ] Identity preserved
+- [ ] Source artifacts removed
+- [ ] Emotional signature reads clearly
+- [ ] Fits Identity Forge cast
+- [ ] Approve or iterate
+
+Decision:
+EOF_COMPARE
+
+  write_character_state "$slug" "$name" review "$next" "$reference" "$prompt_rel" "$generated_rel" "$approved" "" "$prompt_version"
+  echo "promoted: $generated_rel"
+  echo "prompt version: $prompt_version"
+  echo "state: review"
+  echo "next: ./iforge approve"
 }
 
 approve_character() {
-  local slug="$1"
-  local image="${2:-}"
+  local slug
+  slug="$(resolve_slug "${1:-}")"
   ensure_character "$slug"
-  local dir
-  dir="$(character_dir "$slug")"
-  if [[ -z "$image" ]]; then
-    local generated=("$dir"/generated/*)
-    [[ ${#generated[@]} -gt 0 ]] || { echo "No generated image found. Provide an image path." >&2; exit 1; }
-    local last_index=$(( ${#generated[@]} - 1 ))
-    image="${generated[$last_index]}"
-  fi
-  [[ -f "$image" ]] || { echo "Approval image not found: $image" >&2; exit 1; }
-  valid_image_ext "$image" || { echo "Unsupported image type: $image" >&2; exit 1; }
 
-  local ext dest file name iterations reference
-  ext="$(printf '%s' "${image##*.}" | tr '[:upper:]' '[:lower:]')"
-  dest="$dir/approved/canonical.$ext"
-  cp "$image" "$dest"
-  file="$(status_file "$slug")"
+  local file dir name generated image iterations reference prompt prompt_version winning_rel
+  dir="$(character_dir "$slug")"
+  file="$(state_file "$slug")"
   name="$(field "$file" Character)"
+  generated="$(field "$file" 'Generated Image')"
+  [[ -n "$generated" ]] || { echo "No generated image to approve. Run: ./iforge promote batch_output_path" >&2; exit 1; }
+  image="$dir/$generated"
+  [[ -f "$image" ]] || { echo "Generated image missing: $image" >&2; exit 1; }
+
   iterations="$(field "$file" Iterations)"
   reference="$(field "$file" Reference)"
+  prompt="$(field "$file" Prompt)"
+  prompt_version="$(field "$file" 'Prompt Version')"
+  [[ -n "$prompt" ]] || { echo "No active prompt. Run: ./iforge generate" >&2; exit 1; }
+  [[ -f "$dir/$prompt" ]] || { echo "Active prompt missing: $dir/$prompt" >&2; exit 1; }
+  local promoted_prompt_version
+  promoted_prompt_version="$(json_file_field "$dir/generated.json" promptVersion)"
+  [[ -n "$promoted_prompt_version" ]] && prompt_version="$promoted_prompt_version"
+  [[ -n "$prompt_version" ]] || prompt_version="$(prompt_version_from_path "$prompt")"
+
+  mkdir -p "$dir/approved" "$dir/prompts"
+  copy_as_png "$image" "$dir/canonical.png"
+  cp "$dir/canonical.png" "$dir/approved/canonical.png"
+  cp "$dir/$prompt" "$dir/prompts/winning_prompt.md"
+  winning_rel="prompts/winning.json"
+  cat > "$dir/$winning_rel" <<EOF_WINNING
+{
+  "character": "$(json_escape "$name")",
+  "prompt_version": "$(json_escape "$prompt_version")",
+  "prompt": "$(json_escape "$prompt")",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "$(json_escape "$generated")",
+  "canonical_image": "canonical.png",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "$(date '+%Y-%m-%d %H:%M:%S')"
+}
+EOF_WINNING
+
+  [[ -f "$dir/canonical.png" && -f "$dir/prompts/winning.json" ]] || { echo "Approval incomplete: canonical.png and prompts/winning.json are required." >&2; exit 1; }
 
   cat > "$dir/APPROVAL.md" <<EOF_APPROVAL
 # $name Approval
 
 Approved: yes
+Canonical Image: canonical.png
+Approved Image Copy: approved/canonical.png
+Winning Prompt: prompts/winning.json
+Prompt Version: $prompt_version
+Iterations: $iterations/$MAX_ITERATIONS
+Approved At: $(date '+%Y-%m-%d %H:%M:%S')
 
-Approved image: approved/canonical.$ext
-
-Approval notes: Identity preserved. Production can move forward.
-
-Approved at: $(date '+%Y-%m-%d %H:%M:%S')
+Move on.
 EOF_APPROVAL
 
-  write_status "$slug" "$name" Approved "$iterations" "$reference" "approved/canonical.$ext"
+  write_character_state "$slug" "$name" approved "$iterations" "$reference" "$prompt" "$generated" "canonical.png" "$winning_rel" "$prompt_version"
+  echo "approved: $name"
+  echo "canonical: characters/$slug/canonical.png"
+  echo "winning prompt: characters/$slug/prompts/winning.json"
+  echo "next: ./iforge next"
+}
+
+next_character() {
+  printf '' > "$CURRENT_FILE"
+  write_loop_state "" "import"
   regenerate_board
-  echo "Approved $name"
+  echo "NEXT CHARACTER"
+  echo "state: import"
+  echo "next: ./iforge import \"Name\" reference_image"
 }
 
 cmd="${1:-}"
 shift || true
 
 case "$cmd" in
-  new) new_character "$@" ;;
-  validate) [[ $# -eq 1 ]] || { usage; exit 1; }; validate_reference "$1" ;;
-  prompt) [[ $# -eq 1 ]] || { usage; exit 1; }; generate_prompt "$1" ;;
-  launch) [[ $# -eq 1 ]] || { usage; exit 1; }; launch_character "$1" ;;
-  generated) [[ $# -eq 2 ]] || { usage; exit 1; }; record_generated "$1" "$2" ;;
-  approve) [[ $# -ge 1 && $# -le 2 ]] || { usage; exit 1; }; approve_character "$@" ;;
-  status) [[ $# -eq 2 ]] || { usage; exit 1; }; update_status "$1" "$2" ;;
-  board) regenerate_board; echo "Updated PRODUCTION_BOARD.md" ;;
+  import) import_character "$@" ;;
+  generate) [[ $# -le 1 ]] || { usage; exit 1; }; generate_prompt "${1:-}" ;;
+  launch) [[ $# -le 1 ]] || { usage; exit 1; }; launch_character "${1:-}" ;;
+  ingest) ingest_image "$@" ;;
+  promote) promote_candidate "$@" ;;
+  approve) [[ $# -le 1 ]] || { usage; exit 1; }; approve_character "${1:-}" ;;
+  next) [[ $# -eq 0 ]] || { usage; exit 1; }; next_character ;;
   ""|-h|--help|help) usage ;;
   *) usage; exit 1 ;;
 esac

@@ -1,0 +1,10 @@
+{
+  "character": "Builder V Promote Validation",
+  "prompt_version": "P-EE8BF161",
+  "prompt": "prompts/promoted_batch-validation-chatgpt_round_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated.png",
+  "canonical_image": "canonical.png",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-02 12:29:18"
+}

@@ -1,0 +1,1 @@
+Albert Einstein as a historically grounded cinematic animated character, elderly, warm thoughtful eyes, distinctive mustache, wild white hair, gentle intelligence, period-appropriate simple clothing, faithful facial structure, full color, clean studio lighting.

@@ -1,0 +1,30 @@
+{
+  "id": "batch-validation-chatgpt",
+  "characterId": "newton",
+  "status": "complete",
+  "startAt": "2026-07-02T00:00:00.000Z",
+  "intervalMinutes": 10,
+  "referenceImages": [
+    "batches/batch-validation-chatgpt/references/reference_01.png",
+    "batches/batch-validation-chatgpt/references/reference_02.png"
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "prompt": "Using both attached references as identity sources, create one full-color cinematic animated Identity Forge character portrait of Isaac Newton. Preserve his older age, long white hair, period clothing, thoughtful severity, and historical identity while removing engraving, paper, SVG, and placeholder artifacts. Make the result production-ready, emotionally specific, child-appealing, historically grounded, and not a caricature. Output a single image.",
+      "promptVersion": "P-EE8BF161",
+      "plannedAt": "2026-07-02T00:00:00.000Z",
+      "status": "saved",
+      "generatedImagePath": "batches/batch-validation-chatgpt/generated/round_01.png",
+      "startedAt": "2026-07-02T16:54:26.210Z",
+      "error": null,
+      "updatedAt": "2026-07-02T16:54:31.125Z",
+      "failedAt": "2026-07-02T16:51:44.293Z",
+      "savedAt": "2026-07-02T16:54:31.125Z",
+      "promptPath": "batches/batch-validation-chatgpt/generated/round_01.prompt.md",
+      "metadataPath": "batches/batch-validation-chatgpt/generated/round_01.json"
+    }
+  ],
+  "createdAt": "2026-07-02T00:00:00.000Z",
+  "updatedAt": "2026-07-02T16:54:31.125Z"
+}

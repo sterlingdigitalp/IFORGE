@@ -1,186 +1,150 @@
-# Identity Forge Phase 1 Workflow
+# Identity Forge Phase 1 Batch Workflow
 
-Builder V owns the production workflow.
+Builder V owns the loop glue.
 
-The job is to remove friction between:
-
-Reference Image
-
-↓
-
-Canonical Character
-
----
-
-## Production Path
-
-Reference
-
-↓
-
-Prompt
-
-↓
-
-Generate
-
-↓
-
-Critique
-
-↓
-
-Iterate
-
-↓
-
-Approve
-
-↓
-
-Next Character
-
----
-
-## Production Board
-
-Only five states exist:
-
-Research
-
-↓
-
-Ready
-
-↓
-
-Generating
-
-↓
-
-Review
-
-↓
-
-Approved
-
-Nothing else.
-
----
-
-## Builder Handoffs
-
-Builder A provides the reference handoff:
-
-- reference image
-- figure name
-- strongest identity notes
-- historical caution notes
-
-Builder V turns that handoff into a production folder, validates the reference, generates the prompt, opens the browser, and maintains status.
-
-Builder C reviews generated images:
-
-- identity preserved
-- style belongs to Identity Forge
-- emotional signature reads clearly
-- artifacts removed
-- approve or request one focused iteration
-
-Builder V records the result and moves the character forward.
-
----
-
-## Command Flow
-
-Create the character folder:
-
-```bash
-./iforge new "Isaac Newton" /path/to/reference.jpg
-```
-
-Validate the reference:
-
-```bash
-./iforge validate isaac_newton
-```
-
-Generate the prompt:
-
-```bash
-./iforge prompt isaac_newton
-```
-
-Launch ChatGPT / browser helper:
-
-```bash
-./iforge launch isaac_newton
-```
-
-Record a generated image:
-
-```bash
-./iforge generated isaac_newton /path/to/generated.png
-```
-
-Approve the canonical image:
-
-```bash
-./iforge approve isaac_newton /path/to/final.png
-```
-
-Update status manually if needed:
-
-```bash
-./iforge status isaac_newton Review
-```
-
-Regenerate the board:
-
-```bash
-./iforge board
-```
-
----
-
-## Folder Created Per Character
-
-The bootstrap creates only what Phase 1 needs:
+The production path is now batch-first:
 
 ```text
-characters/character_slug/
-    STATUS.md
-    REFERENCE.md
-    REVIEW.md
-    APPROVAL.md
-    prompt.md
-    references/
-    generated/
-    approved/
+IMPORT
+-> GENERATE PROMPT
+-> LAUNCH IMAGE 2
+-> WORKER SAVES BATCH
+-> PROMOTE SELECTED CANDIDATE
+-> COMPARE
+-> APPROVE
+-> CANONICAL
 ```
 
-No databases.
+## Production Architecture
 
-No automation engines.
+```text
+Worker
+-> Batch Output
+-> PROMOTE
+-> generated.png
+-> COMPARE
+-> APPROVE
+-> canonical.png
+```
 
-No future architecture.
+Image 2 explores.
 
----
+The worker collects.
 
-## Iteration Rule
+The operator chooses.
+
+PROMOTE is the human decision that elevates one exploration into the active generated candidate.
+
+APPROVE permanently locks that candidate as canonical.
+
+## State Machine
+
+```text
+imported
+-> prompt_generated
+-> launched
+-> generated
+-> review
+-> approved
+```
+
+`generated` is the transient state created when PROMOTE installs the chosen batch output as the active candidate.
+
+`review` is where comparison and approval happen.
+
+## Commands
+
+All interaction goes through the switchboard:
+
+```bash
+./iforge import "Isaac Newton" /path/to/reference.jpg
+./iforge generate
+./iforge launch
+./iforge promote /path/to/batch/output.png
+./iforge approve
+./iforge next
+```
+
+Manual fallback remains available:
+
+```bash
+./iforge ingest /path/to/generated.png
+```
+
+Do not manually copy batch files into character folders.
+
+## Command Responsibilities
+
+`./iforge import "Name" reference_image`
+
+Creates the character folder, copies the reference image, sets state to `imported`, and makes the character current.
+
+`./iforge generate`
+
+Creates a numbered prompt version in `prompts/`, refreshes `prompt.md` as the operator copy, then sets state to `prompt_generated`.
+
+`./iforge launch`
+
+Creates `LAUNCH.md`, copies the prompt to clipboard when available, and sets state to `launched`.
+
+`./iforge promote batch_output_path`
+
+Calls Builder A's promote endpoint, promotes the selected batch candidate to the active generated image, preserves prompt lineage and batch metadata, moves through `generated`, and lands in `review`.
+
+Promotion writes the active candidate and lineage files:
+
+```text
+generated.png
+generated.json
+prompts/promoted_<batch>_<round>.md
+```
+
+`./iforge ingest image_path`
+
+Manual fallback only. Copies a one-off generated image into the character folder, links it to the active prompt version, creates `COMPARE.md`, moves through `generated`, and lands in `review`.
+
+`./iforge approve`
+
+Saves the reviewed active candidate as `canonical.png`, saves the prompt as the winning prompt, writes `APPROVAL.md`, and sets state to `approved`.
+
+Required approval artifacts:
+
+```text
+canonical.png
+prompts/winning.json
+```
+
+`./iforge next`
+
+Clears the current character and resets the switchboard to import state.
+
+## Prompt Memory Rule
+
+Every approved character carries the exact prompt that generated the promoted candidate.
+
+A canonical character is incomplete unless both files exist:
+
+```text
+canonical.png
+prompts/winning.json
+```
+
+PROMOTE preserves batch prompt hash and metadata.
+
+APPROVE copies that promoted prompt lineage into the canonical record.
+
+## Production Rule
 
 Maximum five iterations.
 
-If the image is historically faithful, visually cohesive, emotionally clear, and production-ready, approve it.
-
-Do not chase perfection.
+Approve.
 
 Move forward.
 
----
+Do not chase perfection.
 
-## Success Standard
+No analytics.
 
-A new historical figure should take less than five minutes to set up before image generation begins.
+No rankings.
 
-The workflow should feel like operating a small animation studio.
+No model training.

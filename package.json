@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "worker:chatgpt": "node scripts/chatgpt-batch-worker.mjs",
     "start": "next start",
     "lint": "next lint"
   },
@@ -17,6 +18,7 @@
     "@tailwindcss/postcss": "4.1.17",
     "@types/node": "26.1.0",
     "@types/react": "19.2.17",
+    "playwright": "^1.61.1",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3"
   }
