@@ -1,0 +1,11 @@
+{
+  "character": "Marie Curie",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "37b0eb0326acdb6fb8943c009650bdd3ff2b794be02900861db2c2f09b415b37",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 16:28:25"
+}

@@ -1,0 +1,11 @@
+{
+  "character": "Florence Nightingale",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "77938923a10c7e25282c78b6dc1bd528eee28696223a467c83aca2c5c671199d",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 16:46:05"
+}

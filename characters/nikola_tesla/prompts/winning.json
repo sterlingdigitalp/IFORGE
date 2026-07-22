@@ -1,0 +1,11 @@
+{
+  "character": "Nikola Tesla",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "dc5ae509c8ea679f5c34279fde001a04c0be2d4438bebdebfcf68a7f071ed7f6",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 16:28:31"
+}

@@ -21,10 +21,12 @@ Commands:
   ./iforge ingest image_path [character_slug]
   ./iforge promote batch_output_path [character_slug]
   ./iforge approve [character_slug]
+  ./iforge export [character_slug] [--flags...]
   ./iforge next
 
 Descriptions:
   promote  Promote a selected batch candidate to the active generated image for comparison and approval.
+  export   Deliver an approved character's canonical image to Director Desk over HTTP.
 
 Loop:
   imported -> prompt_generated -> launched -> generated -> review -> approved
@@ -721,6 +723,24 @@ EOF_APPROVAL
   echo "next: ./iforge next"
 }
 
+export_character() {
+  local provided_slug=""
+  if [[ $# -gt 0 && "$1" != -* ]]; then
+    provided_slug="$1"
+    shift
+  fi
+
+  local slug
+  slug="$(resolve_slug "$provided_slug")"
+  ensure_character "$slug"
+
+  local state
+  state="$(field "$(state_file "$slug")" State)"
+  [[ "$state" == "approved" ]] || { echo "Character is not approved (state: ${state:-unknown}). Run: ./iforge approve" >&2; exit 1; }
+
+  exec node "$ROOT/scripts/export-canonical.mjs" "$slug" "$@"
+}
+
 next_character() {
   printf '' > "$CURRENT_FILE"
   write_loop_state "" "import"
@@ -740,6 +760,7 @@ case "$cmd" in
   ingest) ingest_image "$@" ;;
   promote) promote_candidate "$@" ;;
   approve) [[ $# -le 1 ]] || { usage; exit 1; }; approve_character "${1:-}" ;;
+  export) export_character "$@" ;;
   next) [[ $# -eq 0 ]] || { usage; exit 1; }; next_character ;;
   ""|-h|--help|help) usage ;;
   *) usage; exit 1 ;;

@@ -1,0 +1,11 @@
+{
+  "character": "Ibn al-Haytham",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "fbae3e56690f8bbb252632c98ab5fe1afe79135404ed9c83e93eead973acf0c1",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 16:27:56"
+}

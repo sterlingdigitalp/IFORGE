@@ -1,0 +1,11 @@
+{
+  "character": "Alan Turing",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "e2e8a1524d5329644105c71abb43fcea43100b7f5e3abb910848f0872ca55c96",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 16:46:18"
+}
