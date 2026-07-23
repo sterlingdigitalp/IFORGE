@@ -7,7 +7,7 @@ Generated Image: none
 Canonical Image: none
 Winning Prompt: none
 Next Command: ./iforge import "Name" reference_image
-Last Updated: 2026-07-22 18:58:58
+Last Updated: 2026-07-22 21:05:45
 
 Preferred Workflow: IMPORT -> GENERATE PROMPT -> LAUNCH IMAGE 2 -> WORKER SAVES BATCH -> PROMOTE SELECTED CANDIDATE -> COMPARE -> APPROVE -> CANONICAL
 PROMOTE: human selection; elevates one batch exploration into the active generated candidate.

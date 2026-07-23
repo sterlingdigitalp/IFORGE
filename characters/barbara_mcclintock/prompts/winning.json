@@ -1,0 +1,11 @@
+{
+  "character": "Barbara McClintock",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "ca5fc5741fb3a720468cd09fc6714b37a96632cd5b8c60a747313fa558796649",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:05:12"
+}

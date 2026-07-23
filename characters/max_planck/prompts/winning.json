@@ -1,0 +1,11 @@
+{
+  "character": "Max Planck",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "54ab0cd7549a0b5312eee5d8c7099979abc457bcb9698c083a9f184d27c4abb5",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 19:43:20"
+}

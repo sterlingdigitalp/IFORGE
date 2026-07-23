@@ -1,0 +1,11 @@
+{
+  "character": "Alexander Fleming",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "1d096775832c5373dddb6aef2ddb3dde20290c489a6384934a3cdc6c676f45ad",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 19:43:54"
+}

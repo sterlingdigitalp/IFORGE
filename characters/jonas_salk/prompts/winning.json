@@ -1,0 +1,11 @@
+{
+  "character": "Jonas Salk",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "2d6d321f450362555d4880ee4f40f05ee3d47ef57dac86501cfbc1b0193f4910",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:05:25"
+}

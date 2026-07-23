@@ -1,0 +1,11 @@
+{
+  "character": "Gottfried Wilhelm Leibniz",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "2cd9f1a175bbb73c9ae0395be71e75bb14173132f19af89552b15ac7061618ef",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:04:33"
+}
