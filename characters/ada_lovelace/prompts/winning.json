@@ -3,9 +3,9 @@
   "prompt_version": "prompt_01",
   "prompt": "prompts/prompt_01.md",
   "winning_prompt_copy": "prompts/winning_prompt.md",
-  "generated_image": "generated/iteration_01.jpg",
+  "generated_image": "generated/iteration_02.jpg",
   "canonical_image": "canonical.png",
-  "sha256": "71c8fa682edff031ff038658e6673597c051ebad71df65e900fe60cd9694f56e",
+  "sha256": "777f841ad160d9def49483c9775beac71fb814468e48501e0ef61cea3365a8d9",
   "approved_image_copy": "approved/canonical.png",
-  "approved_at": "2026-07-22 16:28:19"
+  "approved_at": "2026-07-22 18:58:46"
 }

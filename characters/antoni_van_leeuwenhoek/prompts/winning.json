@@ -1,0 +1,11 @@
+{
+  "character": "Antoni van Leeuwenhoek",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "9b5c952e3a6a94ff07dedf06b2ce200c828af3d2293248fd830457c0357120ab",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:06:19"
+}

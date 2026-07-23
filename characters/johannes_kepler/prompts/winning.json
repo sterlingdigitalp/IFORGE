@@ -1,0 +1,11 @@
+{
+  "character": "Johannes Kepler",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "9be78a6560a48bdf785f2a774b70ab7fa3b000ec2fd7aad7c42340316ba4f8d9",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:23:04"
+}

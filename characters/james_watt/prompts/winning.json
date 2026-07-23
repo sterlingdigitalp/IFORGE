@@ -1,0 +1,11 @@
+{
+  "character": "James Watt",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "99618046d9c9c82a93d3c070d3ad17f68590d6170f3a9cb8e81fa626df2992c3",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:55:26"
+}

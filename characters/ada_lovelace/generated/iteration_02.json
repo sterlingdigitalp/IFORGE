@@ -1,0 +1,9 @@
+{
+  "character": "Ada Lovelace",
+  "state": "generated",
+  "iteration": 2,
+  "image": "generated/iteration_02.jpg",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "ingested_at": "2026-07-22 18:58:45"
+}

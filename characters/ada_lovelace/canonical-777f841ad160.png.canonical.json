@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Ada Lovelace",
+  "version": "777f841ad160d9def49483c9775beac71fb814468e48501e0ef61cea3365a8d9",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_02.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

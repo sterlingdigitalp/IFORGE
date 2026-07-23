@@ -1,0 +1,9 @@
+{
+  "character": "Johannes Kepler",
+  "state": "generated",
+  "iteration": 1,
+  "image": "generated/iteration_01.jpg",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "ingested_at": "2026-07-22 18:23:00"
+}

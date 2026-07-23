@@ -1,0 +1,11 @@
+{
+  "character": "Louis Pasteur",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "b1212fed4481fa183ea14dc3988b43b986e9308a19da03cc5fb5d638e0e7fb65",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:06:57"
+}

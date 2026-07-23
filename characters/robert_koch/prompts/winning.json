@@ -1,0 +1,11 @@
+{
+  "character": "Robert Koch",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "fe13beda7a615e4f360da88d67ce2cd6a959121e98c23b776a36c0d39157b541",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:56:58"
+}

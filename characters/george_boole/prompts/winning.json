@@ -1,0 +1,11 @@
+{
+  "character": "George Boole",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "4fd17d18decf959f75fd9ffb1b48222753a0c614d36ddf1e7be8ebe6d3319b9c",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:06:41"
+}

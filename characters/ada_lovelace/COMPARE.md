@@ -1,9 +1,9 @@
 # Ada Lovelace Compare
 
-Generated Image: generated/iteration_01.jpg
+Generated Image: generated/iteration_02.jpg
 Prompt: prompts/prompt_01.md
 Prompt Version: prompt_01
-Iteration: 1/5
+Iteration: 2/5
 
 - [ ] Identity preserved
 - [ ] Source artifacts removed

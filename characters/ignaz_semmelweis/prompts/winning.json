@@ -1,0 +1,11 @@
+{
+  "character": "Ignaz Semmelweis",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "311f94e851dc9997cdde79cc9eef7fb0d10948c3f6c3fdd6454a9bb1898175d9",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 18:23:44"
+}
