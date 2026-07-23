@@ -1,0 +1,11 @@
+{
+  "character": "J. Robert Oppenheimer",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "8911a4420744b6adcc111d170967b8173518c8e6ceebbbea50f48138440041b5",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:50:10"
+}

@@ -1,0 +1,11 @@
+{
+  "character": "Louis Daguerre",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "b0cad031f51a8b5367c8a5b8bd23a8390ff9b527f337a3181fd1d3b75795b21a",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:48:12"
+}

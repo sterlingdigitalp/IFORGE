@@ -1,0 +1,11 @@
+{
+  "character": "Paul Ehrlich",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "b76d76042047b9486cfacb48e624c57970f8531372883ddebb1a4cd008a4c785",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:48:44"
+}

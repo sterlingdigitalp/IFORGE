@@ -1,0 +1,11 @@
+{
+  "character": "Joseph-Michel Montgolfier",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "966cd4933188d1e04b8e20451e83a9ee56437999396ff893be47e2e7f9542374",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 21:47:42"
+}
