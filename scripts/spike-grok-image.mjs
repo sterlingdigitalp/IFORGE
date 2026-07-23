@@ -68,6 +68,41 @@ const IDENTITY = {
   gutenberg: "Johannes Gutenberg in his late forties as a master craftsman at the height of his printing work, translated from the painting: a dark fur cap, full dark brown beard, alert determined eyes, wearing a dark medieval doublet with a small white ruffled collar, rendered in warm natural color",
   euclid: "Euclid of Alexandria in his late forties, translated from the painting into a warm living person: receding dark hair, a full dark beard, intelligent deep-set eyes with the focused gaze of a geometer, olive Mediterranean skin, wearing a simple draped grey-brown scholar's robe, soft even lighting, plain neutral background",
   al_khwarizmi: "Al-Khwarizmi the Persian mathematician in his mid-forties, translated from the engraving into a living person in full color: a neatly wrapped white turban, dark pointed beard, sharp intelligent deep-set eyes, olive skin, wearing a dark scholarly Abbasid-era robe",
+  // Batch 10-11 — the final twenty-three candidates (81-100 + alternates), impact age + working dress.
+  mendel: "Gregor Mendel in his early forties during the pea-plant experiments, a broad kind friar's face with round wire spectacles, receding dark hair, warm patient observant eyes, wearing the plain dark habit of an Augustinian friar, rendered in full natural color",
+  euler: "Leonhard Euler in his mid-forties, translated from the painting: a strong intelligent face with his right eyelid visibly drooping over the weakened eye, brown hair receding beneath a plain grey working cap, wearing a simple grey-blue coat over a soft white shirt, rendered in full natural color",
+  darwin: "Charles Darwin in his early fifties as On the Origin of Species is published, the same face as the reference but de-aged: a full dark grey-streaked beard, heavy brows over deep thoughtful eyes, balding crown, wearing a dark wool coat over a soft white shirt, rendered in full natural color",
+  gauss: "Carl Friedrich Gauss in his early forties, the same face as the reference but de-aged: dark brown hair beneath his black velvet cap, sharp penetrating eyes, a composed formidable expression, wearing a plain dark coat over a white shirt, rendered in full natural color",
+  kilby: "Jack Kilby in his mid-thirties as he built the first integrated circuit, a tall quiet Texan engineer with short dark hair, heavy dark-framed glasses, a long modest face with a slight patient smile, wearing a short-sleeved white shirt and dark tie, rendered in full natural color",
+  hilleman: "Maurice Hilleman in his mid-forties at the height of his vaccine work, sharp intense dark eyes, strong jaw, dark hair combed back, wearing a white laboratory coat over a white shirt and dark tie, rendered in full natural color",
+  hippocrates: "Hippocrates of Kos in his fifties, translated from the classical bust into a living person: a bald crown with soft curly grey-white hair at the sides and a full curly grey-white beard — the hair and beard must be SOFT NATURAL HUMAN HAIR with individual flowing strands and warm color variation, NOT sculpted stone, NOT uniform carved marble ridges — wise measured healer's eyes, weathered warm Mediterranean skin, wearing a draped earth-toned Greek himation, rendered in full natural color",
+  vesalius: "Andreas Vesalius in his late twenties as he wrote the Fabrica, translated from the painting: short dark hair, a full dark beard, intense dark eyes with the boldness of a man who defied thirteen centuries of dogma, wearing a dark doublet with a small white collar, rendered in full natural color",
+  noether: "Emmy Noether in her mid-thirties as she proved her theorem, a warm round face with small round spectacles, dark hair loosely pinned back, bright engaged generous eyes, wearing a simple dark blouse with a soft white collar, rendered in full natural color",
+  eijkman: "Christiaan Eijkman in his early forties during the beriberi investigations, a neat dark mustache, dark hair receding at the temples, a composed methodical Dutch physician's face, wearing a dark suit with a white wing collar and dark cravat, rendered in full natural color",
+  heatley: "Norman Heatley, a modest quiet Oxford biochemist in his early thirties in 1940 — render a period-plausible face: slight build, a high forehead with neat side-parted light brown hair, round wire spectacles, gentle self-effacing intelligent eyes, wearing a white laboratory coat over a shirt and knitted tie, rendered in full natural color",
+  kolff: "Willem Kolff in his early thirties as he built the first artificial kidney in occupied Holland, translated from the statue into a living person: a round determined face, fair hair receding early, round wire glasses, resourceful undaunted eyes, wearing a white doctor's coat over a shirt and tie, rendered in full natural color",
+  sutherland: "Earl Sutherland in his early forties during the cyclic AMP work, the same face as the reference but slightly de-aged: dark hair combed back, strong brows, a direct plainspoken Kansas face, wearing a white laboratory coat over a shirt and dark tie, rendered in full natural color",
+  hounsfield: "Godfrey Hounsfield in his early fifties as he built the first CT scanner, a tall lean English engineer with grey-streaked hair neatly parted, a long modest face with quietly brilliant eyes behind simple glasses, wearing a grey suit, white shirt and dark tie, rendered in full natural color",
+  donald: "Ian Donald, a Scottish obstetrician in his late forties in 1958 as he pioneered medical ultrasound — render a period-plausible face: a tall patrician bearing, swept-back greying hair, a long distinguished face with keen compassionate eyes, wearing a dark suit, white shirt and dark tie, rendered in full natural color",
+  damadian: "Raymond Damadian in his early forties as he built the first MRI scanner, the same face as the reference but de-aged: thick dark hair, strong dark brows, intense driven deep-set eyes, wearing a white laboratory coat over a shirt and dark tie, rendered in full natural color",
+  carver: "George Washington Carver in his mid-forties at Tuskegee, deep brown skin, a lean gentle deeply intelligent face, short black hair, warm curious eyes, wearing a dark suit with a high white collar and a small flower on the lapel as in the reference, rendered in full natural color",
+  hollerith: "Herman Hollerith in his late twenties as his tabulating machines counted the 1890 census, dark hair parted in the center, a robust dark mustache, keen confident inventor's eyes, wearing a dark three-piece suit with a white wing collar and dark cravat, rendered in full natural color",
+  wiener: "Norbert Wiener in his mid-fifties as he founded cybernetics, a round genial face with small round glasses, a short white goatee beard, thinning white hair, playful profound eyes, wearing a dark suit, white shirt and dark bow tie, rendered in full natural color",
+  harvey: "William Harvey in his early fifties as he published on the circulation of blood, long dark grey-streaked hair, a small pointed mustache and chin beard, dark alert precise eyes, wearing a black doublet with a wide flat white collar, rendered in full natural color",
+  joule: "James Prescott Joule in his early thirties during his heat experiments, the same face as the reference but de-aged: neat brown hair side-parted, clean-shaven, an earnest careful brewer-scientist's face with steady exact eyes, wearing a dark Victorian coat, white shirt and dark cravat, rendered in full natural color",
+  carnot: "Sadi Carnot in his late twenties as he wrote on the motive power of fire, the same face as the reference but aged up from the young cadet portrait: dark curly hair, refined serious French features, intense far-seeing eyes, wearing a plain dark high-collared coat with a white shirt and dark cravat — NO military uniform, no epaulettes, no braid",
+  thomson: "J. J. Thomson in his early forties as he discovered the electron, long dark hair parted in the center, small wire-rimmed spectacles, a drooping dark mustache, a donnish reserved face with quietly piercing eyes, wearing a dark suit with a white wing collar and dark tie, rendered in full natural color",
+  // Batch 9 — figures 71-80, impact age + working dress.
+  drebbel: "Cornelis Drebbel the Dutch inventor in his mid-forties as he built the first submarine, translated from the woodcut into a living person in full color: wild unruly dark curly hair, a full bushy dark beard and mustache, bright mischievous inventive eyes, weathered skin, wearing a dark doublet with a fur collar",
+  von_guericke: "Otto von Guericke in his early fifties at the Magdeburg hemispheres demonstration, translated from the engraving into a living person in full color: long wavy dark hair to his shoulders, a thin upturned mustache and small pointed chin beard, dignified burgomaster's bearing, wearing a plain dark coat with a wide flat white collar",
+  papin: "Denis Papin in his late thirties as he invented the pressure digester, long wavy dark brown natural hair, clean-shaven, a lean determined Huguenot exile's face with intense hopeful eyes, wearing a plain dark coat with a simple white cravat, rendered in full natural color",
+  newcomen: "Thomas Newcomen, an English ironmonger-engineer and lay preacher in his late forties around 1712 — no portrait of him survives, so render a period-plausible honest tradesman's face: sturdy and square-jawed, ruddy weathered cheeks, steady practical brown eyes, shoulder-length brown hair, clean-shaven, wearing a plain dark early-18th-century coat over a simple white neckcloth",
+  smeaton: "John Smeaton the first civil engineer in his early forties at the Eddystone lighthouse, grey-brown hair swept back from a high forehead, a strong practical thoughtful face, steady grey eyes, wearing a plain dark coat and simple white neckcloth, rendered in full natural color",
+  whitney: "Eli Whitney in his mid-thirties after the cotton gin and during his interchangeable-parts work, receding dark hair with short sideburns, a long shrewd Yankee face with calm calculating eyes, wearing a dark high-collared coat, white shirt and white cravat, rendered in full natural color",
+  goodyear: "Charles Goodyear in his early forties during the vulcanization discovery, the same gaunt intense face as the reference: unruly dark hair, deep-set burning determined eyes, hollow weathered cheeks of a man who ruined himself for an idea, wearing a plain dark coat, white shirt and dark bow tie, rendered in full natural color",
+  otis: "Elisha Otis in his early forties at the elevator safety-brake demonstration, the same face as the reference slightly de-aged: dark hair swept to the side, a full dark chest-length beard, steady no-nonsense mechanic's gaze, wearing a dark coat, white shirt and dark cravat, rendered in full natural color",
+  morton: "William Morton in his early thirties at the first public ether demonstration, wavy dark hair, a large dark drooping mustache, an earnest ambitious young dentist's face, wearing a dark coat, dark stock cravat and white shirt, rendered in full natural color",
+  crick: "Francis Crick in his mid-thirties as he co-discovered the DNA double helix, the same face as the reference but de-aged four decades: wavy light-brown hair receding at the temples, his characteristic prominent arched eyebrows, a long animated face with a wide brilliant grin and quick delighted eyes, wearing a tweed jacket, white shirt and dark tie, rendered in full natural color",
   // Batch 8 — figures 61-70, impact age + working dress.
   heisenberg: "Werner Heisenberg in his mid-twenties as he formulated quantum mechanics, short neatly combed light brown hair, a boyish bright face with keen confident eyes, wearing a plain dark suit, white shirt and dark tie, rendered in full natural color",
   fermi: "Enrico Fermi in his early forties at the first nuclear reactor, dark receding hair, a compact strong Italian face with alert grey-green eyes and a slight knowing smile, wearing a plain dark suit, white shirt and dark tie, rendered in full natural color",
@@ -156,6 +191,7 @@ function parseArgs(argv) {
       case "--candidates": a.candidates = Math.max(1, Number(v(i++)) || 3); break;
       case "--recipes": a.recipes = v(i++).split(",").map((s) => s.trim()).filter(Boolean); break;
       case "--only": a.only = new Set(v(i++).split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)); break;
+      case "--textonly": a.textonly = new Set(v(i++).split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)); break;
     }
   }
   a.refs = a.refs || path.join(ROOT, "tmp", "grok-spike", "refs");
@@ -276,6 +312,10 @@ async function runMatrix(token, args) {
   catch { die(`Reference folder not found: ${args.refs}`); }
   let refs = entries.filter((f) => /\.(png|jpe?g|webp)$/i.test(f)).sort();
   if (args.only) refs = refs.filter((f) => args.only.has(path.basename(f, path.extname(f)).toLowerCase()));
+  // Text-only figures (no surviving likeness, e.g. Newcomen): pure text->image via
+  // /images/generations, identity carried entirely by the IDENTITY cue. Listed as
+  // virtual "refs" so they flow through the same loop; recipe overridden per-slug.
+  if (args.textonly) for (const slug of args.textonly) refs.push(`${slug}.__textonly__`);
   if (!refs.length) die(`No reference images in ${args.refs}${args.only ? ` matching --only ${[...args.only].join(",")}` : ""}.`);
   const recipeIds = args.recipes.map((id) => RECIPES[id] ? id : die(`Unknown recipe "${id}". Known: ${Object.keys(RECIPES).join(", ")}`));
 
@@ -286,15 +326,18 @@ async function runMatrix(token, args) {
   const results = [];
   let runTicks = 0, calls = 0;
   for (const file of refs) {
+    const textOnly = file.endsWith(".__textonly__");
     const name = path.basename(file, path.extname(file)).toLowerCase();
-    const ext = path.extname(file).slice(1).toLowerCase();
-    const bytes = await fs.readFile(path.join(args.refs, file));
-    const dataUri = `data:${MIME[ext] || "image/jpeg"};base64,${bytes.toString("base64")}`;
+    const bytes = textOnly ? null : await fs.readFile(path.join(args.refs, file));
+    const ext = textOnly ? null : path.extname(file).slice(1).toLowerCase();
+    const dataUri = textOnly ? null : `data:${MIME[ext] || "image/jpeg"};base64,${bytes.toString("base64")}`;
     const identity = IDENTITY[name] || name.replace(/[_-]+/g, " ");
     const prompt = args.prompt || STYLE_PROMPT(identity);
 
     for (const id of recipeIds) {
-      const recipe = RECIPES[id];
+      const recipe = textOnly
+        ? { endpoint: "/images/generations", body: (identity, _uri, model, prompt) => ({ model, prompt, n: 1, aspect_ratio: "1:1", resolution: "1k", response_format: "b64_json" }) }
+        : RECIPES[id];
       for (let c = 1; c <= args.candidates; c++) {
         process.stdout.write(`  • ${name} / ${id} / c${c} … `);
         const reqBody = recipe.body(identity, dataUri, args.model, prompt);

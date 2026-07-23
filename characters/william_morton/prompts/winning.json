@@ -1,0 +1,11 @@
+{
+  "character": "William Morton",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "80bd3f4b5a3352524d898f6e92f053f9e6d6f24eda7be252eb5acafcd710c893",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 22:54:20"
+}

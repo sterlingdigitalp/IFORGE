@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Ian Donald",
+  "version": "b2b578b086501b694270330442bc6e03e3a01a72a9f4148d378618554cdb7c35",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_01.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

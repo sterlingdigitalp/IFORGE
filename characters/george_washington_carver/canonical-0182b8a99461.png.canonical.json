@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "George Washington Carver",
+  "version": "0182b8a99461a302e630c9be13ff28f9725c39a5c9e7574f88403f2a066534e4",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_01.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

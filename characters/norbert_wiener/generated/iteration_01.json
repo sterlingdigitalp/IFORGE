@@ -1,0 +1,9 @@
+{
+  "character": "Norbert Wiener",
+  "state": "generated",
+  "iteration": 1,
+  "image": "generated/iteration_01.jpg",
+  "prompt_version": "prompt_02",
+  "prompt": "prompts/prompt_02.md",
+  "ingested_at": "2026-07-22 23:09:00"
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Christiaan Eijkman",
+  "version": "33d710253e474a1ea88d3d6b425b9f3d3bf6aa526f812570fbb32a7907bf44b6",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_01.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

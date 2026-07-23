@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Norbert Wiener",
+  "version": "559609fa6584f9ff15ecce3c2bb1400baf3bb6eb89d00fdee30ea591fc50e977",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_01.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

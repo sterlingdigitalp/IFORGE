@@ -1,0 +1,11 @@
+{
+  "character": "Francis Crick",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "5c761610fca4ce3e83346e509786c72da2a8d4f3fad2d038a5056480c16f542b",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 22:54:37"
+}

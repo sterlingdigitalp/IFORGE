@@ -1,0 +1,11 @@
+{
+  "character": "Charles Darwin",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "9c2d2f49aa794247355b03bdf116c94a01cb169ba8454b2cae4729855a5496f3",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 23:04:45"
+}

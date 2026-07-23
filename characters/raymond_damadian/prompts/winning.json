@@ -1,0 +1,11 @@
+{
+  "character": "Raymond Damadian",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "f9d194a7b240e63bacc904e57948c659c7ac972fbedb607589ba00a0fa3126e1",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 23:08:25"
+}

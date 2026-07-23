@@ -1,0 +1,11 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Jack Kilby",
+  "version": "06436af4639894ca1e4e30ac3b52f1855865e155dd7477ca2308866c7fdf20d3",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Approved in Identity Forge via CLI path ./iforge approve from prompt version prompt_01; generated image generated/iteration_01.jpg",
+  "license": "TODO: usage rights not yet designated"
+}

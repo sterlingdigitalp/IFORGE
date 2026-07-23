@@ -1,0 +1,11 @@
+{
+  "character": "William Harvey",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "a571563f4c2c38cead86025d85491e985501a0bc2aecde462426b1a1e69f529d",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 23:05:14"
+}

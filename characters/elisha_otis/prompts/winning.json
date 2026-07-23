@@ -1,0 +1,11 @@
+{
+  "character": "Elisha Otis",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "195d3574603dbf49e4dfe23234273352d2aa25379a8ca626d97ae55f49876cfd",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 22:54:04"
+}

@@ -1,0 +1,11 @@
+{
+  "character": "John Smeaton",
+  "prompt_version": "prompt_01",
+  "prompt": "prompts/prompt_01.md",
+  "winning_prompt_copy": "prompts/winning_prompt.md",
+  "generated_image": "generated/iteration_01.jpg",
+  "canonical_image": "canonical.png",
+  "sha256": "cc5d4137ba309c2bd5a07ff1e48a57fe2b625e06e4240432677f3913e80a7a42",
+  "approved_image_copy": "approved/canonical.png",
+  "approved_at": "2026-07-22 22:53:11"
+}
