@@ -30,7 +30,10 @@ const TIMEOUT_MS = 120_000;
 const TICKS_PER_USD = 1e9;
 const MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" };
 
-// DD-supplied pilot: slug -> { name, base, targets:[young, old] }. base = current canonical depicted_age.
+// DD-supplied pilot: slug -> { name, base, targets:[young, old], youngNote?, oldNote? }.
+// base = current canonical depicted_age. youngNote/oldNote = per-character historical
+// feature corrections, needed where the mid-life anchor has sticky age-markers (heavy
+// beard, baldness) the model won't shed on its own — the pilot's key finding.
 const PILOT = {
   euclid:                 { name: "Euclid",                  base: 48, targets: [28, 65] },
   archimedes:             { name: "Archimedes",              base: 55, targets: [30, 72] },
@@ -38,10 +41,12 @@ const PILOT = {
   ibn_al_haytham:         { name: "Ibn al-Haytham",          base: 45, targets: [30, 68] },
   johannes_gutenberg:     { name: "Johannes Gutenberg",      base: 48, targets: [30, 65] },
   nicolaus_copernicus:    { name: "Nicolaus Copernicus",     base: 42, targets: [30, 70] },
-  galileo_galilei:        { name: "Galileo Galilei",         base: 45, targets: [28, 70] },
+  galileo_galilei:        { name: "Galileo Galilei",         base: 45, targets: [28, 70],
+    youngNote: "at this young age a fuller head of dark auburn hair with no receding hairline, and only a short light beard rather than a full one" },
   antoni_van_leeuwenhoek: { name: "Antoni van Leeuwenhoek",  base: 48, targets: [32, 75] },
   william_gilbert:        { name: "William Gilbert",         base: 48, targets: [32, 58] },
-  charles_darwin:         { name: "Charles Darwin",          base: 52, targets: [25, 68] },
+  charles_darwin:         { name: "Charles Darwin",          base: 52, targets: [25, 68],
+    youngNote: "at this young age COMPLETELY CLEAN-SHAVEN with NO beard and NO moustache, and a full head of dark brown hair with no balding (Darwin was beardless with full hair in his twenties)" },
 };
 
 function die(m) { console.error(`\n✗ ${m}\n`); process.exit(1); }
@@ -62,16 +67,19 @@ async function loadStylePrompt() {
 
 // The variant identity cue. Leans HARD on same-person because that is the non-negotiable;
 // varies ONLY apparent age + age-appropriate hair/skin. The house-style block wraps this.
-function variantIdentity(name, target, base) {
+function variantIdentity(name, target, base, note) {
   const younger = target < base;
+  // Younger: actively SHED accumulated age-markers (baldness, heavy grey beards) — the
+  // pilot found the model keeps them and lands middle-aged otherwise. Older: accumulate them.
   const delta = younger
-    ? "smoother, less-lined skin, fuller and darker hair with little or no grey, and more youthful features"
-    : "more lined and weathered skin, thinner and greyer or white hair and beard, and an older, more settled bearing";
+    ? "noticeably smoother youthful skin with no age lines, a fuller and darker head of hair with no grey and no balding or receding hairline, and if the reference shows a heavy grey or full beard that a person this young would not yet have, reduce it to a lighter, shorter beard or clean-shaven"
+    : "more lined and weathered older skin, thinner and greyer or white hair and beard, and an older, more settled bearing";
   return (
     `${name} — THE EXACT SAME PERSON shown in the reference image, with the identical unmistakable facial identity: ` +
     `same face shape, same eyes, nose, brow, and bone structure, same defining identity cues. ` +
-    `Depict this same individual at approximately ${target} years old, with ${delta}. ` +
-    `This MUST read as the same person at a different age, never a different person — preserve every identity cue exactly and vary ONLY apparent age and age-appropriate hair/skin. ` +
+    `Depict this same individual convincingly at approximately ${target} years old, with ${delta}. ` +
+    (note ? `${note}. ` : "") +
+    `This MUST clearly read as ${target} years old AND unmistakably the same person — preserve the facial geometry and identity exactly while changing apparent age and age-appropriate hair. ` +
     `keep the same wardrobe style, framing, and plain neutral background as the reference`
   );
 }
@@ -143,13 +151,22 @@ async function embed(p) {
 }
 
 function parseArgs(argv) {
-  const a = { dryRun: false, candidates: 3, only: null };
+  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--dry-run") a.dryRun = true;
     else if (argv[i] === "--candidates") a.candidates = Math.max(1, Number(argv[++i]) || 3);
     else if (argv[i] === "--only") a.only = new Set(argv[++i].split(",").map((s) => s.trim().toLowerCase()));
+    else if (argv[i] === "--young-only") a.youngOnly = true;
+    else if (argv[i] === "--old-only") a.oldOnly = true;
   }
   return a;
+}
+
+// The younger target is the smaller of the two.
+function selectTargets(targets, args) {
+  if (args.youngOnly) return [Math.min(...targets)];
+  if (args.oldOnly) return [Math.max(...targets)];
+  return targets;
 }
 
 async function main() {
@@ -161,7 +178,7 @@ async function main() {
   let slugs = Object.keys(PILOT);
   if (args.only) slugs = slugs.filter((s) => args.only.has(s));
   const jobs = [];
-  for (const slug of slugs) for (const target of PILOT[slug].targets) jobs.push({ slug, target });
+  for (const slug of slugs) for (const target of selectTargets(PILOT[slug].targets, args)) jobs.push({ slug, target });
   const total = jobs.length * args.candidates;
 
   console.log(`Age-variant forge — api=${API_BASE}  model=${MODEL}`);
@@ -172,13 +189,14 @@ async function main() {
   let runTicks = 0;
 
   for (const slug of slugs) {
-    const { name, base, targets } = PILOT[slug];
+    const { name, base, targets, youngNote, oldNote } = PILOT[slug];
     const canonical = path.join(ROOT, "characters", slug, "canonical.png");
     if (!(await fs.access(canonical).then(() => true).catch(() => false))) die(`missing canonical: ${canonical}`);
     const dataUri = args.dryRun ? null : `data:image/png;base64,${(await fs.readFile(canonical)).toString("base64")}`;
 
-    for (const target of targets) {
-      const prompt = STYLE_PROMPT(variantIdentity(name, target, base));
+    for (const target of selectTargets(targets, args)) {
+      const note = target < base ? youngNote : oldNote;
+      const prompt = STYLE_PROMPT(variantIdentity(name, target, base, note));
       if (args.dryRun) {
         console.log(`── ${slug}  base ${base} → age ${target}  (${target < base ? "younger" : "older"}, source=canonical.png)`);
         console.log(`   ${prompt}\n`);
