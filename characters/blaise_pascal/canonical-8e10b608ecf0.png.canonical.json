@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Blaise Pascal",
+  "depicted_age": 32,
   "version": "8e10b608ecf05a612119f9e7baeef54ee2c08a36389f9a6c296bbbe7eb46e7b3",
   "created_by": {
     "app": "identity-forge",

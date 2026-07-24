@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Marie Curie",
+  "depicted_age": 38,
   "version": "37b0eb0326acdb6fb8943c009650bdd3ff2b794be02900861db2c2f09b415b37",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "John Dalton",
+  "depicted_age": 42,
   "version": "2f3f2797bb354982510f6d9aceb4ee2903ef829aaa24dc6864aa735876ee6e2a",
   "created_by": {
     "app": "identity-forge",

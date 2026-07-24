@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Nicolaus Copernicus",
+  "depicted_age": 42,
   "version": "14559b729d02579bed2d7de971b086bfd4186d8a51f9c025b86bae118c3e0256",
   "created_by": {
     "app": "identity-forge",

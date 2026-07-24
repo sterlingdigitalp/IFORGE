@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Benjamin Franklin",
+  "depicted_age": 45,
   "version": "945dca72fb795fe96718acb5386e3918f730e128bb73e49b348f10b0d4b72eab",
   "created_by": {
     "app": "identity-forge",

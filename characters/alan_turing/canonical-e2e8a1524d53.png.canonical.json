@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Alan Turing",
+  "depicted_age": 35,
   "version": "e2e8a1524d5329644105c71abb43fcea43100b7f5e3abb910848f0872ca55c96",
   "created_by": {
     "app": "identity-forge",

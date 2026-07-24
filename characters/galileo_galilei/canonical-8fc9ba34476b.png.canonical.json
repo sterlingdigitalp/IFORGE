@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Galileo Galilei",
+  "depicted_age": 45,
   "version": "8fc9ba34476b3b4d63e3f69eaebe7d4ae677e12cc83f09c6c5f184de1ed3c690",
   "created_by": {
     "app": "identity-forge",

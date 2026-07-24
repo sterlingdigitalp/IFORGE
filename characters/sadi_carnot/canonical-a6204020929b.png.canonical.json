@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Sadi Carnot",
+  "depicted_age": 28,
   "version": "a6204020929b16f9a8d0e2837b0c083e80ff170225c15a85728f8d80aee6fe41",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Eli Whitney",
+  "depicted_age": 35,
   "version": "58d497caf1f9a4350e4c2d36d7ba95756e986a24c2f16d56c1c1006286448067",
   "created_by": {
     "app": "identity-forge",

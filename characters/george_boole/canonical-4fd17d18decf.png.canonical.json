@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "George Boole",
+  "depicted_age": 42,
   "version": "4fd17d18decf959f75fd9ffb1b48222753a0c614d36ddf1e7be8ebe6d3319b9c",
   "created_by": {
     "app": "identity-forge",

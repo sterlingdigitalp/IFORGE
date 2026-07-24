@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Jonas Salk",
+  "depicted_age": 42,
   "version": "2d6d321f450362555d4880ee4f40f05ee3d47ef57dac86501cfbc1b0193f4910",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Evangelista Torricelli",
+  "depicted_age": 38,
   "version": "bba67a7016503e9f52ab8d008d45d0719de9491c023f99ec26449a493e2f5607",
   "created_by": {
     "app": "identity-forge",

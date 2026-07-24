@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Willem Kolff",
+  "depicted_age": 32,
   "version": "ab5d591b0997cd50dd494a518aa3c858983f5dd61d53a889833f2f7d950a0b87",
   "created_by": {
     "app": "identity-forge",

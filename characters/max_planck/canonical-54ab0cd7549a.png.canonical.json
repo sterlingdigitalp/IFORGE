@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Max Planck",
+  "depicted_age": 42,
   "version": "54ab0cd7549a0b5312eee5d8c7099979abc457bcb9698c083a9f184d27c4abb5",
   "created_by": {
     "app": "identity-forge",

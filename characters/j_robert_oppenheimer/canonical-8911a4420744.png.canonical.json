@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "J. Robert Oppenheimer",
+  "depicted_age": 42,
   "version": "8911a4420744b6adcc111d170967b8173518c8e6ceebbbea50f48138440041b5",
   "created_by": {
     "app": "identity-forge",

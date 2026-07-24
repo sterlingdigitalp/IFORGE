@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Elisha Otis",
+  "depicted_age": 42,
   "version": "195d3574603dbf49e4dfe23234273352d2aa25379a8ca626d97ae55f49876cfd",
   "created_by": {
     "app": "identity-forge",

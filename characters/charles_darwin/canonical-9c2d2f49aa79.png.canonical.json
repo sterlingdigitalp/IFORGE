@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Charles Darwin",
+  "depicted_age": 52,
   "version": "9c2d2f49aa794247355b03bdf116c94a01cb169ba8454b2cae4729855a5496f3",
   "created_by": {
     "app": "identity-forge",

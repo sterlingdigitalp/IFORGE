@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Alexander Fleming",
+  "depicted_age": 48,
   "version": "1d096775832c5373dddb6aef2ddb3dde20290c489a6384934a3cdc6c676f45ad",
   "created_by": {
     "app": "identity-forge",

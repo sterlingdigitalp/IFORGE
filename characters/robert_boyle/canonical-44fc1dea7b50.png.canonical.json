@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Robert Boyle",
+  "depicted_age": 35,
   "version": "44fc1dea7b50d0af782692e8ef897d206afa69b55d8f8a8475e756679e1d8833",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "George Stephenson",
+  "depicted_age": 48,
   "version": "d4d7984dae6f698784313f274b03eef3bb566fbfd0a699eb693e239fbb26e265",
   "created_by": {
     "app": "identity-forge",

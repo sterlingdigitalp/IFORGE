@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Otto von Guericke",
+  "depicted_age": 52,
   "version": "0a85905ef1990d008bfc4efd362a7d104d76e58907b9899017e0db63e5803c00",
   "created_by": {
     "app": "identity-forge",

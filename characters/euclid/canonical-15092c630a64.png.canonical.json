@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Euclid",
+  "depicted_age": 48,
   "version": "15092c630a64c1a20d72d9856741217c27e5ab7e6e7735ebfd497a960ee8bcb2",
   "created_by": {
     "app": "identity-forge",

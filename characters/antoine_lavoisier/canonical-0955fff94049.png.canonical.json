@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Antoine Lavoisier",
+  "depicted_age": 45,
   "version": "0955fff940499f961992af09edc9b66e113042cb5a69b2b2b7052d9808c5a535",
   "created_by": {
     "app": "identity-forge",

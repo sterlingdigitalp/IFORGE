@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "James Clerk Maxwell",
+  "depicted_age": 35,
   "version": "8583d508d885de69e64ac757279f1fc247cc9ab0b77948e4c355b20bac4be8af",
   "created_by": {
     "app": "identity-forge",

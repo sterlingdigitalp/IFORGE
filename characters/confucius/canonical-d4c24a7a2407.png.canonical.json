@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Confucius",
+  "depicted_age": 55,
   "version": "d4c24a7a24074f65dd3155d5abb236f2db914755762470a38418623f8085b260",
   "created_by": {
     "app": "identity-forge",

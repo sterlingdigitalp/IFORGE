@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "John Snow",
+  "depicted_age": 42,
   "version": "c3d1bcad9075c6b58e362649871b76faa52f205be7f417161db1aad77faf8136",
   "created_by": {
     "app": "identity-forge",

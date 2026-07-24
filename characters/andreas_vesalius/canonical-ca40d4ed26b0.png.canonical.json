@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Andreas Vesalius",
+  "depicted_age": 28,
   "version": "ca40d4ed26b0ef28f41ac3cb733ce27c811de068bee858452331148128532c9d",
   "created_by": {
     "app": "identity-forge",

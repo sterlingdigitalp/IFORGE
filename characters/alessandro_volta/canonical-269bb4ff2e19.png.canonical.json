@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Alessandro Volta",
+  "depicted_age": 52,
   "version": "269bb4ff2e1936491b5d1173d43281284f7112a51768b797f2241a2be0038925",
   "created_by": {
     "app": "identity-forge",

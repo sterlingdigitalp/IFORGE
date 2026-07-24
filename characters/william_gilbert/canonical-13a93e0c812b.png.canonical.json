@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "William Gilbert",
+  "depicted_age": 48,
   "version": "13a93e0c812bfe5775d839fc2d7897ae14987fdccae758e2a29ddf1c8d81b315",
   "created_by": {
     "app": "identity-forge",

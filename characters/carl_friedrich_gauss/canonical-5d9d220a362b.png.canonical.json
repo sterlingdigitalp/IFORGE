@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Carl Friedrich Gauss",
+  "depicted_age": 42,
   "version": "5d9d220a362ba92f009bd3011a2f79f34f59a1e383bb5f844093d8ee0c755a3f",
   "created_by": {
     "app": "identity-forge",

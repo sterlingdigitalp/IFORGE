@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "James Prescott Joule",
+  "depicted_age": 32,
   "version": "7d70000b44b55a4783a7fe9de61c4ed525f02f05021b04c667a7178743d01614",
   "created_by": {
     "app": "identity-forge",

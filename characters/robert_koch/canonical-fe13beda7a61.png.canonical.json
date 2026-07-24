@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Robert Koch",
+  "depicted_age": 42,
   "version": "fe13beda7a615e4f360da88d67ce2cd6a959121e98c23b776a36c0d39157b541",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Earl Sutherland",
+  "depicted_age": 42,
   "version": "b10ce7c04832168c2c053b3043da0e928e0747f4cb50d2d2b48710b06a694749",
   "created_by": {
     "app": "identity-forge",

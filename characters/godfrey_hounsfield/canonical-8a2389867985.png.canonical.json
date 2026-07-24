@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Godfrey Hounsfield",
+  "depicted_age": 52,
   "version": "8a238986798511254db11c6e44a52e089f7be4c90606c38070270ca5e74e1519",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Emmy Noether",
+  "depicted_age": 35,
   "version": "23d7057cc77dddd328d864f337a8caa40b49e224a75cbc2212dfaa6084567b33",
   "created_by": {
     "app": "identity-forge",

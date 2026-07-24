@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Karl Landsteiner",
+  "depicted_age": 35,
   "version": "02ad7948570881d48e89a9b8a46332893d5dbb0e0c40b2a1fe3a7ac5ec81ba9c",
   "created_by": {
     "app": "identity-forge",

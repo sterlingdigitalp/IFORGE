@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Albert Einstein",
+  "depicted_age": 42,
   "version": "c0a7c1f2d94d63287c0e965d7411459b7a6d87aa9fdb62fde283de718c676b56",
   "created_by": {
     "app": "identity-forge",

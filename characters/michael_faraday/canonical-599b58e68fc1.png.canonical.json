@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Michael Faraday",
+  "depicted_age": 45,
   "version": "599b58e68fc189f5cadf40a92b3c0c8c897d14d7ab0afb44b7d19a8148432541",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Dmitri Mendeleev",
+  "depicted_age": 42,
   "version": "b0c4381ab42209d01b525adca777ba8eb676111fb3c6f60f614d63f23bb11445",
   "created_by": {
     "app": "identity-forge",

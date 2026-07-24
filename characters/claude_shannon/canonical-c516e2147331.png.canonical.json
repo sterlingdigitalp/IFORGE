@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Claude Shannon",
+  "depicted_age": 35,
   "version": "c516e2147331409912e6fec4d7029b3916f8b145c986bb1582ed023506c0eca5",
   "created_by": {
     "app": "identity-forge",

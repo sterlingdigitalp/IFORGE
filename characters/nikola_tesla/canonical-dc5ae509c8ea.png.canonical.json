@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Nikola Tesla",
+  "depicted_age": 34,
   "version": "dc5ae509c8ea679f5c34279fde001a04c0be2d4438bebdebfcf68a7f071ed7f6",
   "created_by": {
     "app": "identity-forge",

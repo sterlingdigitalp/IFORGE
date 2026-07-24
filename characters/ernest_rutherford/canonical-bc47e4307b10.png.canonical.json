@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Ernest Rutherford",
+  "depicted_age": 42,
   "version": "bc47e4307b1088b984058e59cf58248c93d89588434fd72fb1be7162a58aa6a0",
   "created_by": {
     "app": "identity-forge",

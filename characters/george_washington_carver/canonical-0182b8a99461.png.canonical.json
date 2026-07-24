@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "George Washington Carver",
+  "depicted_age": 45,
   "version": "0182b8a99461a302e630c9be13ff28f9725c39a5c9e7574f88403f2a066534e4",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Alexander Graham Bell",
+  "depicted_age": 48,
   "version": "fdb6c9237b999f8d3ffd793efcf85345eb6b7bb1b85dd4d352370535efeb5ccb",
   "created_by": {
     "app": "identity-forge",

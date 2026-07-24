@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Frederick Douglass",
+  "depicted_age": 35,
   "version": "61c6d6a95352862f892563196055267b2289b4100ed5b32828238a2f058db2ee",
   "created_by": {
     "app": "identity-forge",

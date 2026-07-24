@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Henry Bessemer",
+  "depicted_age": 42,
   "version": "097f17c740023c774a7531ba5871fa22f37d762cbadeac1339f50c0486bf0989",
   "created_by": {
     "app": "identity-forge",

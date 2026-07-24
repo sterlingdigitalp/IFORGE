@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Edward Jenner",
+  "depicted_age": 48,
   "version": "a9448948d0a0321fb212782af5f04a719d5b94a8e294b00ffe48a6444ade8f27",
   "created_by": {
     "app": "identity-forge",

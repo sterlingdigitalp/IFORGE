@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Paul Ehrlich",
+  "depicted_age": 55,
   "version": "b76d76042047b9486cfacb48e624c57970f8531372883ddebb1a4cd008a4c785",
   "created_by": {
     "app": "identity-forge",

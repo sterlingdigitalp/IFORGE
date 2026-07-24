@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Ada Lovelace",
+  "depicted_age": 27,
   "version": "71c8fa682edff031ff038658e6673597c051ebad71df65e900fe60cd9694f56e",
   "created_by": {
     "app": "identity-forge",

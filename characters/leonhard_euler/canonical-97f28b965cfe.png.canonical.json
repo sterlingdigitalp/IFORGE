@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Leonhard Euler",
+  "depicted_age": 45,
   "version": "97f28b965cfe50c99a806968f51a501d760217f736efd2c5ed27f75d55bf984c",
   "created_by": {
     "app": "identity-forge",

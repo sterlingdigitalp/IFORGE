@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Niels Bohr",
+  "depicted_age": 35,
   "version": "f81daa287975eacdcc93afb2e8feca31d63c75bdf068b2f8e2570804395b50c5",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Francis Crick",
+  "depicted_age": 35,
   "version": "5c761610fca4ce3e83346e509786c72da2a8d4f3fad2d038a5056480c16f542b",
   "created_by": {
     "app": "identity-forge",

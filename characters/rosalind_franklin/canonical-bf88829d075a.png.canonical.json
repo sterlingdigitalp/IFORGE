@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Rosalind Franklin",
+  "depicted_age": 32,
   "version": "bf88829d075aadae4a6f016471c0bbf009ceacdccc0ca178a8832da4a0f53b45",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Hippocrates",
+  "depicted_age": 55,
   "version": "983fe989c67b5dcb5350db8e1650e8a336e0ce342d921139cea2039fd0a95c9e",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Isaac Newton",
+  "depicted_age": 46,
   "version": "f2e4b69e3466e6066837f47f256c39383760df15e02edd3f9f5f74f7a3e74963",
   "created_by": {
     "app": "identity-forge",

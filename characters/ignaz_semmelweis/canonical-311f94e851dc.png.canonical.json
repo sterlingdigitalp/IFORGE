@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Ignaz Semmelweis",
+  "depicted_age": 35,
   "version": "311f94e851dc9997cdde79cc9eef7fb0d10948c3f6c3fdd6454a9bb1898175d9",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Su Song",
+  "depicted_age": 58,
   "version": "93018e6457b119ffc3aeadfe44b57e5edc8ad5f7062b900bfd357c1143cec942",
   "created_by": {
     "app": "identity-forge",

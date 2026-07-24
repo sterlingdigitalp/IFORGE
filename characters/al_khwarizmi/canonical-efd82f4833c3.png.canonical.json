@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Al-Khwarizmi",
+  "depicted_age": 45,
   "version": "efd82f4833c3df15db937b7f16fe1cda96f36731d4e1e93785b7189d6ad0101c",
   "created_by": {
     "app": "identity-forge",

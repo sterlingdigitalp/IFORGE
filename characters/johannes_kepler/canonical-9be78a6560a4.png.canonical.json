@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Johannes Kepler",
+  "depicted_age": 38,
   "version": "9be78a6560a48bdf785f2a774b70ab7fa3b000ec2fd7aad7c42340316ba4f8d9",
   "created_by": {
     "app": "identity-forge",

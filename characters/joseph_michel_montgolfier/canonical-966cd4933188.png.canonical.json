@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Joseph-Michel Montgolfier",
+  "depicted_age": 45,
   "version": "966cd4933188d1e04b8e20451e83a9ee56437999396ff893be47e2e7f9542374",
   "created_by": {
     "app": "identity-forge",

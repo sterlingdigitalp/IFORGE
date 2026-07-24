@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Norman Borlaug",
+  "depicted_age": 52,
   "version": "d7ddc7a8dc5bf60f97db0d99941e50113aa766966fdf99ca39d47f0fab47b080",
   "created_by": {
     "app": "identity-forge",

@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Charles Goodyear",
+  "depicted_age": 42,
   "version": "92e283ec8c1843a019a7ed68702added7ab7e09bd56b5ae2e018276b844bd426",
   "created_by": {
     "app": "identity-forge",

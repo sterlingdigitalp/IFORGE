@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Enrico Fermi",
+  "depicted_age": 42,
   "version": "f8170bef2d224917be3363c80197506bdf742a674bb87fe28d37d2d665431fc6",
   "created_by": {
     "app": "identity-forge",

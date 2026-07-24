@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Wilhelm Rontgen",
+  "depicted_age": 52,
   "version": "3357fa5137ec157e8f2cd0f4d9b978e70c934b5ec88069a945a7b63987120a40",
   "created_by": {
     "app": "identity-forge",

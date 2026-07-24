@@ -1,6 +1,7 @@
 {
   "schema_version": "canonical_image.v1",
   "character_name": "Leonardo da Vinci",
+  "depicted_age": 45,
   "version": "5e28cc52c05f4a9025e9d9dcba0f55ce1a62c71d4846f03c11fbee71b7ef546c",
   "created_by": {
     "app": "identity-forge",
