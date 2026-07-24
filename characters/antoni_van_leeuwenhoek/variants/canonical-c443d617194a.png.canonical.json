@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Antoni van Leeuwenhoek",
+  "depicted_age": 32,
+  "version": "c443d617194afdd4b37a139255f5f4ebfaad124a7eea3761196821de5e2372ff",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Age variant (apparent age 32, young) forged from the primary canonical via forge-age-variants.mjs — star-topology edit-from-canonical; age-variant pilot 2026-07-24",
+  "license": "TODO: usage rights not yet designated"
+}
