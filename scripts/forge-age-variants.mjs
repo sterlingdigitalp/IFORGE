@@ -35,18 +35,26 @@ const MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "i
 // feature corrections, needed where the mid-life anchor has sticky age-markers (heavy
 // beard, baldness) the model won't shed on its own — the pilot's key finding.
 const PILOT = {
-  euclid:                 { name: "Euclid",                  base: 48, targets: [28, 65] },
-  archimedes:             { name: "Archimedes",              base: 55, targets: [30, 72] },
-  al_khwarizmi:           { name: "Al-Khwarizmi",            base: 45, targets: [28, 65] },
-  ibn_al_haytham:         { name: "Ibn al-Haytham",          base: 45, targets: [30, 68] },
-  johannes_gutenberg:     { name: "Johannes Gutenberg",      base: 48, targets: [30, 65] },
-  nicolaus_copernicus:    { name: "Nicolaus Copernicus",     base: 42, targets: [30, 70] },
+  euclid:                 { name: "Euclid",                  base: 48, targets: [28, 65],
+    youngNote: "a fuller head of hair with no receding hairline, and a short, tightly-cropped beard rather than a long one" },
+  archimedes:             { name: "Archimedes",              base: 55, targets: [30, 72],
+    youngNote: "keep the dark hair and beard but trim the beard to a neater medium length; the youth comes from erasing the forehead and brow wrinkles" },
+  al_khwarizmi:           { name: "Al-Khwarizmi",            base: 45, targets: [28, 65],
+    youngNote: "a tight, short, neatly-trimmed dark beard rather than a bushy full one, and no creases between the brows" },
+  ibn_al_haytham:         { name: "Ibn al-Haytham",          base: 45, targets: [30, 68],
+    youngNote: "a short, tightly-trimmed dark beard rather than a long full one" },
+  johannes_gutenberg:     { name: "Johannes Gutenberg",      base: 48, targets: [30, 65],
+    youngNote: "COMPLETELY CLEAN-SHAVEN with NO beard and NO moustache (his beard came later in life)" },
+  nicolaus_copernicus:    { name: "Nicolaus Copernicus",     base: 42, targets: [30, 70],
+    youngNote: "clean-shaven as in the reference, with noticeably shorter hair than the reference, and no forehead lines, no under-eye lines and no smile lines" },
   galileo_galilei:        { name: "Galileo Galilei",         base: 45, targets: [28, 70],
-    youngNote: "at this young age a fuller head of dark auburn hair with no receding hairline, and only a short light beard rather than a full one" },
-  antoni_van_leeuwenhoek: { name: "Antoni van Leeuwenhoek",  base: 48, targets: [32, 75] },
-  william_gilbert:        { name: "William Gilbert",         base: 48, targets: [32, 58] },
+    youngNote: "a fuller head of dark auburn hair with no receding hairline, and only a short light beard rather than a full one" },
+  antoni_van_leeuwenhoek: { name: "Antoni van Leeuwenhoek",  base: 48, targets: [32, 75],
+    youngNote: "clean-shaven as in the reference, with noticeably SHORTER hair than the reference — shorter hair is the primary youth cue here" },
+  william_gilbert:        { name: "William Gilbert",         base: 48, targets: [32, 58],
+    youngNote: "COMPLETELY CLEAN-SHAVEN — remove the goatee and all facial hair entirely (keep the fuller head hair); this reads instantly more boyish" },
   charles_darwin:         { name: "Charles Darwin",          base: 52, targets: [25, 68],
-    youngNote: "at this young age COMPLETELY CLEAN-SHAVEN with NO beard and NO moustache, and a full head of dark brown hair with no balding (Darwin was beardless with full hair in his twenties)" },
+    youngNote: "COMPLETELY CLEAN-SHAVEN with NO beard and NO moustache, and a full head of dark brown hair with no balding (Darwin was beardless with full hair in his twenties)" },
 };
 
 function die(m) { console.error(`\n✗ ${m}\n`); process.exit(1); }
@@ -69,10 +77,12 @@ async function loadStylePrompt() {
 // varies ONLY apparent age + age-appropriate hair/skin. The house-style block wraps this.
 function variantIdentity(name, target, base, note) {
   const younger = target < base;
-  // Younger: actively SHED accumulated age-markers (baldness, heavy grey beards) — the
-  // pilot found the model keeps them and lands middle-aged otherwise. Older: accumulate them.
+  // Younger: on stylized faces the youth signal is carried by WRINKLE REDUCTION and
+  // HAIR/BEARD LENGTH, not skin tone (DD review finding). The single biggest "too old"
+  // tell is retained forehead lines, glabellar (between-brow) creases, and under-eye bags —
+  // kill those explicitly. Beard/hair specifics come from the per-character note.
   const delta = younger
-    ? "noticeably smoother youthful skin with no age lines, a fuller and darker head of hair with no grey and no balding or receding hairline, and if the reference shows a heavy grey or full beard that a person this young would not yet have, reduce it to a lighter, shorter beard or clean-shaven"
+    ? "a distinctly younger face driven by smoothing away age lines and by hair — specifically NO forehead lines, NO vertical glabellar creases between the eyebrows, NO under-eye bags or lines, and smooth youthful skin, together with a fuller head of darker hair with no grey and no balding or receding hairline"
     : "more lined and weathered older skin, thinner and greyer or white hair and beard, and an older, more settled bearing";
   return (
     `${name} — THE EXACT SAME PERSON shown in the reference image, with the identical unmistakable facial identity: ` +
