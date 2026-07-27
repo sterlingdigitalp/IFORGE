@@ -36,11 +36,15 @@ const MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "i
 // beard, baldness) the model won't shed on its own — the pilot's key finding.
 const PILOT = {
   euclid:                 { name: "Euclid",                  base: 48, targets: [28, 65],
-    youngNote: "a fuller head of hair with no receding hairline, and a short, tightly-cropped beard rather than a long one" },
+    // v2b concrete-cue pass: hairline recession + beard bulk + forehead lines were the
+    // remaining age markers at +6.
+    youngNote: "thick hair growing full and low across the entire hairline with NO recession at the temples and no high bared forehead; the beard cropped very close and short against the jawline rather than full; a completely smooth unlined forehead with no horizontal creases at all and no vertical lines between the brows; no hollowing beneath the cheekbones" },
   archimedes:             { name: "Archimedes",              base: 55, targets: [30, 72],
-    youngNote: "keep the dark hair and beard but trim the beard to a neater medium length; the youth comes from erasing the forehead and brow wrinkles" },
+    // v2b concrete-cue pass: beard bulk + persistent brow lines were the age markers at +4.
+    youngNote: "keep the dark curly hair, but crop the beard very close and short against the jawline rather than full and bushy; a completely smooth unlined forehead with no horizontal creases at all and no vertical lines between the brows; smooth skin beneath the eyes with no bags; no hollowing beneath the cheekbones" },
   al_khwarizmi:           { name: "Al-Khwarizmi",            base: 45, targets: [28, 65],
-    youngNote: "a tight, short, neatly-trimmed dark beard rather than a bushy full one, and no creases between the brows" },
+    // v2b concrete-cue pass: residual beard bulk + brow creases at +5.
+    youngNote: "the dark beard cropped very close and short against the jawline, barely more than heavy stubble, rather than full; a completely smooth unlined forehead with no horizontal creases at all and no vertical lines between the brows; smooth full cheeks with no hollowing beneath the cheekbones" },
   ibn_al_haytham:         { name: "Ibn al-Haytham",          base: 45, targets: [30, 68],
     youngNote: "a short, tightly-trimmed dark beard rather than a long full one" },
   johannes_gutenberg:     { name: "Johannes Gutenberg",      base: 48, targets: [30, 65],
@@ -51,7 +55,9 @@ const PILOT = {
     // fullness is not slimming/beautifying, so it does not fight the structure lock).
     youngNote: "clean-shaven as in the reference; hair cut CLOSE and SHORT — cropped above the ears and above the collar, clearly and obviously shorter than the reference's long shoulder-length hair; completely smooth cheeks with NO lines running from the nose down to the corners of the mouth and NO hollowing beneath the cheekbones, since a young man's face still carries soft fullness in the cheeks" },
   galileo_galilei:        { name: "Galileo Galilei",         base: 45, targets: [28, 70],
-    youngNote: "a fuller head of dark auburn hair with no receding hairline, and only a short light beard rather than a full one" },
+    // v2b concrete-cue pass: stubble + hairline + persistent brow creases at +5. DD's
+    // direction for Galileo was wrinkles only, so the beard is reduced, not removed.
+    youngNote: "thick dark auburn hair growing full and low across the entire hairline with NO recession at the temples; the beard reduced to a very close-cropped short beard against the jawline, not full; a completely smooth unlined forehead with no horizontal creases at all and no vertical lines between the brows; smooth skin beneath the eyes with no bags or shadows; no hollowing beneath the cheekbones" },
   antoni_van_leeuwenhoek: { name: "Antoni van Leeuwenhoek",  base: 48, targets: [32, 75],
     youngNote: "clean-shaven as in the reference, with noticeably SHORTER hair than the reference — shorter hair is the primary youth cue here" },
   william_gilbert:        { name: "William Gilbert",         base: 48, targets: [32, 58],
