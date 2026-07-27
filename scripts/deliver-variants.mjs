@@ -49,6 +49,58 @@ const WINNERS = [
 
 function die(m) { console.error(`\n✗ ${m}\n`); process.exit(1); }
 
+// ── Gate-driven promotion ────────────────────────────────────────────────────
+// NEVER default to c1. DD's pilot gate found c1 was the winner for only 4 of 10
+// young variants, and Darwin's c1 was an outright identity FAILURE (0.523 own-anchor,
+// margin -0.04 => matched another character's anchor better). Promotion must select the
+// gate winner: highest MARGIN among candidates whose verdict is pass.
+//
+// Acceptance is RELATIVE (own-anchor top-1, margin >= MIN_MARGIN), never an absolute
+// cosine threshold — the shared house style pushes cross-character cosine as high as
+// 0.78, so absolutes do not separate identities (DD calibration note).
+const MIN_MARGIN = 0.10;
+
+async function loadGate(file) {
+  let gate;
+  try { gate = JSON.parse(await fs.readFile(file, "utf8")); }
+  catch (e) { die(`could not read gate results ${file}: ${e.message}`); }
+  const rows = gate.results || gate;
+  if (!Array.isArray(rows)) die(`gate file has no results array`);
+  return rows;
+}
+
+// -> Map "slug|age" => winning row. Reports every (slug,age) with no passing candidate.
+function selectWinners(rows) {
+  const groups = new Map();
+  for (const r of rows) {
+    const key = `${r.slug}|${r.target_age ?? r.depicted_age}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+  const winners = new Map(), unfillable = [];
+  for (const [key, cands] of groups) {
+    const passing = cands.filter((c) => {
+      const margin = Number(c.margin);
+      const verdictOk = c.verdict ? /^pass/i.test(c.verdict) : true;
+      return verdictOk && Number.isFinite(margin) && margin >= MIN_MARGIN;
+    });
+    if (!passing.length) { unfillable.push({ key, cands }); continue; }
+    passing.sort((a, b) => Number(b.margin) - Number(a.margin));
+    winners.set(key, passing[0]);
+  }
+  return { winners, unfillable };
+}
+
+// Primary canonical's name + depicted_age (the identity anchor a variant is measured against).
+async function anchorInfo(slug) {
+  const dir = path.join(ROOT, "characters", slug);
+  const files = await fs.readdir(dir);
+  const sc = files.find((f) => /^canonical-[0-9a-f]{12}\.png\.canonical\.json$/.test(f));
+  if (!sc) die(`no primary sidecar for ${slug}`);
+  const j = JSON.parse(await fs.readFile(path.join(dir, sc), "utf8"));
+  return { name: j.character_name, age: Number(j.depicted_age) };
+}
+
 async function pkgVersion() {
   try { return JSON.parse(await fs.readFile(path.join(ROOT, "package.json"), "utf8")).version || "unknown"; }
   catch { return "unknown"; }
@@ -118,9 +170,29 @@ async function main() {
   const only = onlyIdx >= 0 ? new Set(argv[onlyIdx + 1].split(",")) : null;
   const appVersion = await pkgVersion();
 
-  let items = WINNERS;
+  // --gate <file>: promote DD's gate winners (highest passing margin), never c1-by-default.
+  const gateIdx = argv.indexOf("--gate");
+  let items;
+  if (gateIdx >= 0) {
+    const rows = await loadGate(argv[gateIdx + 1]);
+    const { winners, unfillable } = selectWinners(rows);
+    for (const u of unfillable) {
+      const best = u.cands.slice().sort((a, b) => Number(b.margin) - Number(a.margin))[0];
+      console.error(`  ✗ NO PASSING CANDIDATE for ${u.key} (best margin ${best?.margin}) — needs re-roll, not delivered`);
+    }
+    items = [];
+    for (const [key, w] of winners) {
+      const [slug] = key.split("|");
+      const anchor = await anchorInfo(slug);
+      const kind = Number(w.depicted_age ?? w.target_age) < anchor.age ? "young" : "old";
+      items.push([slug, anchor.name, kind, w.candidate, Number(w.depicted_age ?? w.target_age), w]);
+    }
+    if (unfillable.length) console.error("");
+  } else {
+    items = WINNERS;
+  }
   if (only) items = items.filter((w) => only.has(w[0]));
-  console.log(`Age-variant delivery — ${items.length} variant(s)  mode=${doDeliver ? `DELIVER → ${DD_URL}` : "graduate-only"}\n`);
+  console.log(`Age-variant delivery — ${items.length} variant(s)  mode=${doDeliver ? `DELIVER → ${DD_URL}` : "graduate-only"}${gateIdx >= 0 ? "  [gate-winner selection]" : ""}\n`);
 
   const graduated = [];
   for (const w of items) {

@@ -82,13 +82,22 @@ function variantIdentity(name, target, base, note) {
   // tell is retained forehead lines, glabellar (between-brow) creases, and under-eye bags —
   // kill those explicitly. Beard/hair specifics come from the per-character note.
   const delta = younger
-    ? "a distinctly younger face driven by smoothing away age lines and by hair — specifically NO forehead lines, NO vertical glabellar creases between the eyebrows, NO under-eye bags or lines, and smooth youthful skin, together with a fuller head of darker hair with no grey and no balding or receding hairline"
+    ? "a distinctly younger face achieved ONLY by smoothing skin and by hair — specifically NO forehead lines, NO vertical glabellar creases between the eyebrows, NO under-eye bags or lines, NO nasolabial folds, NO marionette lines, and no jowls or sagging along the jaw, together with smooth taut youthful skin and a fuller head of darker hair with no grey and no balding or receding hairline"
     : "more lined and weathered older skin, thinner and greyer or white hair and beard, and an older, more settled bearing";
+  // The identity-vs-age tradeoff (DD gate, 2026-07-27): Darwin's two FAILING young
+  // candidates were the ones that looked youngest — they de-aged by genericizing the bone
+  // structure (lost his heavy brow and strong nose), so antelopev2 matched another
+  // character's anchor better. The passing candidate kept the structure. So youth must be
+  // spent on skin and hair ONLY; naming the load-bearing structures protects identity.
+  const structureLock = younger
+    ? "CRITICAL: keep the EXACT same distinctive bone structure as the reference — the same brow ridge and its heaviness, the same nose size and shape, the same jaw width, the same eye spacing and eye set, the same face length and cheekbones. The youth must come ONLY from smoother skin, fewer lines, and fuller darker hair. Do NOT slim, soften, prettify, regularize or make the face more conventionally handsome: a de-aged face whose structure has been smoothed into a generic handsome young man IS A DIFFERENT PERSON and is a failure. "
+    : "";
   return (
     `${name} — THE EXACT SAME PERSON shown in the reference image, with the identical unmistakable facial identity: ` +
     `same face shape, same eyes, nose, brow, and bone structure, same defining identity cues. ` +
     `Depict this same individual convincingly at approximately ${target} years old, with ${delta}. ` +
     (note ? `${note}. ` : "") +
+    structureLock +
     `This MUST clearly read as ${target} years old AND unmistakably the same person — preserve the facial geometry and identity exactly while changing apparent age and age-appropriate hair. ` +
     `keep the same wardrobe style, framing, and plain neutral background as the reference`
   );
@@ -161,13 +170,14 @@ async function embed(p) {
 }
 
 function parseArgs(argv) {
-  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false };
+  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false, out: null };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--dry-run") a.dryRun = true;
     else if (argv[i] === "--candidates") a.candidates = Math.max(1, Number(argv[++i]) || 3);
     else if (argv[i] === "--only") a.only = new Set(argv[++i].split(",").map((s) => s.trim().toLowerCase()));
     else if (argv[i] === "--young-only") a.youngOnly = true;
     else if (argv[i] === "--old-only") a.oldOnly = true;
+    else if (argv[i] === "--out") a.out = argv[++i];
   }
   return a;
 }
@@ -182,7 +192,10 @@ function selectTargets(targets, args) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const STYLE_PROMPT = await loadStylePrompt();
-  const outDir = path.join(ROOT, "tmp", "grok-spike", "variants");
+  // Write each run to its own directory when --out is given: candidates are evidence,
+  // and overwriting them in place destroys provenance (it made a delivery dispute
+  // unresolvable on 2026-07-27 — DD could not tell a re-roll from the original).
+  const outDir = args.out ? path.resolve(ROOT, args.out) : path.join(ROOT, "tmp", "grok-spike", "variants");
   await fs.mkdir(outDir, { recursive: true });
 
   let slugs = Object.keys(PILOT);
