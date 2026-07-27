@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Johannes Gutenberg",
+  "depicted_age": 31,
+  "version": "c73e84bbda43224845099a616b27a137d156068b995eb9eea54549010f5beeff",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Age variant (apparent age 31, young) forged from the primary canonical via forge-age-variants.mjs — star-topology edit-from-canonical; age-variant pilot 2026-07-24",
+  "license": "TODO: usage rights not yet designated"
+}

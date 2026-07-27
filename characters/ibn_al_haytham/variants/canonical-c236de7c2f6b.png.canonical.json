@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Ibn al-Haytham",
+  "depicted_age": 31,
+  "version": "c236de7c2f6b2bf5721a4c658cdabb180dae7508eca175527cd17e2f64c31c60",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Age variant (apparent age 31, young) forged from the primary canonical via forge-age-variants.mjs — star-topology edit-from-canonical; age-variant pilot 2026-07-24",
+  "license": "TODO: usage rights not yet designated"
+}

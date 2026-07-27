@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Charles Darwin",
+  "depicted_age": 31,
+  "version": "ae4ee63793ccf9fe076b7cd25602e95815946ae7ec88ca5f578f0d32587c1322",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Age variant (apparent age 31, young) forged from the primary canonical via forge-age-variants.mjs — star-topology edit-from-canonical; age-variant pilot 2026-07-24",
+  "license": "TODO: usage rights not yet designated"
+}

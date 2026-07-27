@@ -1,0 +1,12 @@
+{
+  "schema_version": "canonical_image.v1",
+  "character_name": "Nicolaus Copernicus",
+  "depicted_age": 31,
+  "version": "d819350e08c63ce1953cf74f7e2221919b6cbd4c4b7f61542d8a2393e7e2c5b8",
+  "created_by": {
+    "app": "identity-forge",
+    "version": "0.1.0"
+  },
+  "provenance": "Age variant (apparent age 31, young) forged from the primary canonical via forge-age-variants.mjs — star-topology edit-from-canonical; age-variant pilot 2026-07-24",
+  "license": "TODO: usage rights not yet designated"
+}

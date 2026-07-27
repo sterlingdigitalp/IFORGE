@@ -109,7 +109,10 @@ async function pkgVersion() {
 // Graduate: copy candidate into characters/<slug>/variants/, hashed + immutable, with sidecar.
 async function graduate(w, appVersion) {
   const [slug, name, kind, file, age] = w;
-  const src = path.join(VAR, file);
+  // A bare filename resolves against the default candidate dir; a path (containing "/")
+  // resolves from repo root. REQUIRED once more than one run directory exists: v2 and v2b
+  // hold same-named candidates for the same character, so a bare name is ambiguous.
+  const src = file.includes("/") ? path.resolve(ROOT, file) : path.join(VAR, file);
   try { await fs.access(src); } catch { die(`missing candidate: ${src}`); }
   const dir = path.join(ROOT, "characters", slug, "variants");
   await fs.mkdir(dir, { recursive: true });
