@@ -46,7 +46,10 @@ const PILOT = {
   johannes_gutenberg:     { name: "Johannes Gutenberg",      base: 48, targets: [30, 65],
     youngNote: "COMPLETELY CLEAN-SHAVEN with NO beard and NO moustache (his beard came later in life)" },
   nicolaus_copernicus:    { name: "Nicolaus Copernicus",     base: 42, targets: [30, 70],
-    youngNote: "clean-shaven as in the reference, with noticeably shorter hair than the reference, and no forehead lines, no under-eye lines and no smile lines" },
+    // v2b: "noticeably shorter hair" was ignored twice — replaced with a concrete cut, and
+    // cheek HOLLOWING added as an explicit age tell (a young face keeps soft cheek fullness;
+    // fullness is not slimming/beautifying, so it does not fight the structure lock).
+    youngNote: "clean-shaven as in the reference; hair cut CLOSE and SHORT — cropped above the ears and above the collar, clearly and obviously shorter than the reference's long shoulder-length hair; completely smooth cheeks with NO lines running from the nose down to the corners of the mouth and NO hollowing beneath the cheekbones, since a young man's face still carries soft fullness in the cheeks" },
   galileo_galilei:        { name: "Galileo Galilei",         base: 45, targets: [28, 70],
     youngNote: "a fuller head of dark auburn hair with no receding hairline, and only a short light beard rather than a full one" },
   antoni_van_leeuwenhoek: { name: "Antoni van Leeuwenhoek",  base: 48, targets: [32, 75],
