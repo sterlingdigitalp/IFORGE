@@ -198,6 +198,17 @@ function selectTargets(targets, args) {
   return targets;
 }
 
+// Log spend to the same meter the cast generator uses, so one file holds total spend.
+async function recordUsage(runTicks, calls) {
+  const p = path.join(ROOT, "tmp", "grok-spike", "usage.json");
+  let data = { cumulative_ticks: 0, runs: [] };
+  try { data = JSON.parse(await fs.readFile(p, "utf8")); } catch { }
+  data.cumulative_ticks = (data.cumulative_ticks || 0) + runTicks;
+  data.runs.push({ at: new Date().toISOString(), ticks: runTicks, calls, tool: "forge-age-variants" });
+  await fs.writeFile(p, JSON.stringify(data, null, 2) + "\n");
+  return data.cumulative_ticks;
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const STYLE_PROMPT = await loadStylePrompt();
@@ -277,8 +288,9 @@ async function main() {
   const sheet = path.join(outDir, "pilot-contact-sheet.html");
   await fs.writeFile(sheet, html);
 
+  const cumulative = await recordUsage(runTicks, results.length);
   const usdApprox = (runTicks / TICKS_PER_USD).toFixed(2);
-  console.log(`\n── run: ~$${usdApprox} across ${results.length} generations`);
+  console.log(`\n── run: ~${usdApprox} across ${results.length} generations  |  cumulative all-tools: ~${(cumulative / TICKS_PER_USD).toFixed(2)}`);
   console.log(`✓ Contact sheet: ${path.relative(ROOT, sheet)}`);
 }
 
