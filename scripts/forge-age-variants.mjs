@@ -179,7 +179,7 @@ async function embed(p) {
 }
 
 function parseArgs(argv) {
-  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false, out: null };
+  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false, out: null, targets: null };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--dry-run") a.dryRun = true;
     else if (argv[i] === "--candidates") a.candidates = Math.max(1, Number(argv[++i]) || 3);
@@ -187,6 +187,7 @@ function parseArgs(argv) {
     else if (argv[i] === "--young-only") a.youngOnly = true;
     else if (argv[i] === "--old-only") a.oldOnly = true;
     else if (argv[i] === "--out") a.out = argv[++i];
+    else if (argv[i] === "--targets") a.targets = argv[++i];
   }
   return a;
 }
@@ -209,30 +210,43 @@ async function recordUsage(runTicks, calls) {
   return data.cumulative_ticks;
 }
 
+// Build a PILOT-shaped map from a derived target table, so runs beyond the pilot 10 do
+// not need hand-written entries. Rows: {slug, name, anchor, target, skip}.
+async function loadTargets(file) {
+  const j = JSON.parse(await fs.readFile(path.resolve(ROOT, file), "utf8"));
+  const map = {};
+  for (const r of (j.rows || j)) {
+    if (r.skip) continue;
+    map[r.slug] = { name: r.name, base: Number(r.anchor), targets: [Number(r.target)] };
+  }
+  return map;
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const STYLE_PROMPT = await loadStylePrompt();
+  const MAP = args.targets ? await loadTargets(args.targets) : PILOT;
   // Write each run to its own directory when --out is given: candidates are evidence,
   // and overwriting them in place destroys provenance (it made a delivery dispute
   // unresolvable on 2026-07-27 — DD could not tell a re-roll from the original).
   const outDir = args.out ? path.resolve(ROOT, args.out) : path.join(ROOT, "tmp", "grok-spike", "variants");
   await fs.mkdir(outDir, { recursive: true });
 
-  let slugs = Object.keys(PILOT);
+  let slugs = Object.keys(MAP);
   if (args.only) slugs = slugs.filter((s) => args.only.has(s));
   const jobs = [];
-  for (const slug of slugs) for (const target of selectTargets(PILOT[slug].targets, args)) jobs.push({ slug, target });
+  for (const slug of slugs) for (const target of selectTargets(MAP[slug].targets, args)) jobs.push({ slug, target });
   const total = jobs.length * args.candidates;
 
   console.log(`Age-variant forge — api=${API_BASE}  model=${MODEL}`);
-  console.log(`${slugs.length} character(s) × 2 targets × ${args.candidates} candidate(s) = ${total} generations${args.dryRun ? "  [DRY RUN — no API calls]" : ` ≈ $${(total * 0.6).toFixed(2)}`}\n`);
+  console.log(`${slugs.length} character(s) × ${jobs.length} target(s) × ${args.candidates} candidate(s) = ${total} generations${args.dryRun ? "  [DRY RUN — no API calls]" : ` ≈ $${(total * 0.6).toFixed(2)}`}\n`);
 
   const token = args.dryRun ? null : await loadToken();
   const results = [];
   let runTicks = 0;
 
   for (const slug of slugs) {
-    const { name, base, targets, youngNote, oldNote } = PILOT[slug];
+    const { name, base, targets, youngNote, oldNote } = MAP[slug];
     const canonical = path.join(ROOT, "characters", slug, "canonical.png");
     if (!(await fs.access(canonical).then(() => true).catch(() => false))) die(`missing canonical: ${canonical}`);
     const dataUri = args.dryRun ? null : `data:image/png;base64,${(await fs.readFile(canonical)).toString("base64")}`;
@@ -263,7 +277,7 @@ async function main() {
   // Per-character 3-age contact sheet: [canonical @ base] [young c1-3] [old c1-3] — the review artifact.
   const rows = [];
   for (const slug of slugs) {
-    const { name, base, targets } = PILOT[slug];
+    const { name, base, targets } = MAP[slug];
     const cells = [{ label: `canonical · age ${base}`, uri: await embed(path.join(ROOT, "characters", slug, "canonical.png")), anchor: true }];
     for (const target of targets) for (let k = 1; k <= args.candidates; k++) {
       const rec = results.find((r) => r.slug === slug && r.target === target && r.k === k);
