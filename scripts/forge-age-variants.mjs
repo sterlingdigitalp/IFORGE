@@ -84,12 +84,28 @@ async function loadStylePrompt() {
 
 // The variant identity cue. Leans HARD on same-person because that is the non-negotiable;
 // varies ONLY apparent age + age-appropriate hair/skin. The house-style block wraps this.
-function variantIdentity(name, target, base, note) {
+function variantIdentity(name, target, base, note, noLock, era, hair) {
   const younger = target < base;
   // Younger: on stylized faces the youth signal is carried by WRINKLE REDUCTION and
   // HAIR/BEARD LENGTH, not skin tone (DD review finding). The single biggest "too old"
   // tell is retained forehead lines, glabellar (between-brow) creases, and under-eye bags —
   // kill those explicitly. Beard/hair specifics come from the per-character note.
+  // CHILD band: a child is not a smoothed adult — the skull proportions genuinely differ.
+  // Identity here can only ride on colouring and the few stable features (eye colour/shape,
+  // hair, ear set); brow/jaw/nose are undeveloped at this age by definition.
+  if (younger && target <= 14) {
+    return (
+      `${name} as a CHILD of about ${target} years old — recognisably the same individual in childhood, ` +
+      `the same eye colour and eye shape, the same ear shape and set, ` +
+      (hair ? `${hair}, ` : `the same hair colour and hairline pattern as the reference, `) +
+      `the same skin tone and overall cast of the face as the adult reference. ` +
+      `Render true child proportions, NOT a miniature adult: a proportionally larger cranium, a smaller and softer lower face, ` +
+      `large clear eyes set relatively low in the face, a small soft undeveloped nose, a rounded chin and jaw with no adult jaw width, ` +
+      `NO brow ridge, full round cheeks, and completely smooth unlined child skin. ` +
+      (era ? `Wearing ${era}. ` : "") +
+      `Plain neutral background, head-and-shoulders, near-frontal with eyes to camera.`
+    );
+  }
   const delta = younger
     ? "a distinctly younger face achieved ONLY by smoothing skin and by hair — specifically NO forehead lines, NO vertical glabellar creases between the eyebrows, NO under-eye bags or lines, NO nasolabial folds, NO marionette lines, and no jowls or sagging along the jaw, together with smooth taut youthful skin and a fuller head of darker hair with no grey and no balding or receding hairline"
     : "more lined and weathered older skin, thinner and greyer or white hair and beard, and an older, more settled bearing";
@@ -98,7 +114,7 @@ function variantIdentity(name, target, base, note) {
   // structure (lost his heavy brow and strong nose), so antelopev2 matched another
   // character's anchor better. The passing candidate kept the structure. So youth must be
   // spent on skin and hair ONLY; naming the load-bearing structures protects identity.
-  const structureLock = younger
+  const structureLock = (younger && !noLock)
     ? "CRITICAL: keep the EXACT same distinctive bone structure as the reference — the same brow ridge and its heaviness, the same nose size and shape, the same jaw width, the same eye spacing and eye set, the same face length and cheekbones. The youth must come ONLY from smoother skin, fewer lines, and fuller darker hair. Do NOT slim, soften, prettify, regularize or make the face more conventionally handsome: a de-aged face whose structure has been smoothed into a generic handsome young man IS A DIFFERENT PERSON and is a failure. "
     : "";
   return (
@@ -179,7 +195,7 @@ async function embed(p) {
 }
 
 function parseArgs(argv) {
-  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false, out: null, targets: null };
+  const a = { dryRun: false, candidates: 3, only: null, youngOnly: false, oldOnly: false, out: null, targets: null, noLock: false };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--dry-run") a.dryRun = true;
     else if (argv[i] === "--candidates") a.candidates = Math.max(1, Number(argv[++i]) || 3);
@@ -188,6 +204,7 @@ function parseArgs(argv) {
     else if (argv[i] === "--old-only") a.oldOnly = true;
     else if (argv[i] === "--out") a.out = argv[++i];
     else if (argv[i] === "--targets") a.targets = argv[++i];
+    else if (argv[i] === "--no-lock") a.noLock = true;
   }
   return a;
 }
@@ -217,7 +234,8 @@ async function loadTargets(file) {
   const map = {};
   for (const r of (j.rows || j)) {
     if (r.skip) continue;
-    map[r.slug] = { name: r.name, base: Number(r.anchor), targets: [Number(r.target)] };
+    if (!map[r.slug]) map[r.slug] = { name: r.name, base: Number(r.anchor), targets: [], era: r.era, hair: r.hair };
+    map[r.slug].targets.push(Number(r.target));
   }
   return map;
 }
@@ -253,7 +271,7 @@ async function main() {
 
     for (const target of selectTargets(targets, args)) {
       const note = target < base ? youngNote : oldNote;
-      const prompt = STYLE_PROMPT(variantIdentity(name, target, base, note));
+      const prompt = STYLE_PROMPT(variantIdentity(name, target, base, note, args.noLock, MAP[slug].era, MAP[slug].hair));
       if (args.dryRun) {
         console.log(`── ${slug}  base ${base} → age ${target}  (${target < base ? "younger" : "older"}, source=canonical.png)`);
         console.log(`   ${prompt}\n`);
