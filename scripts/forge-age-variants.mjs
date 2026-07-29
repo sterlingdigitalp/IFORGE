@@ -234,8 +234,11 @@ async function loadTargets(file) {
   const map = {};
   for (const r of (j.rows || j)) {
     if (r.skip) continue;
-    if (!map[r.slug]) map[r.slug] = { name: r.name, base: Number(r.anchor), targets: [], era: r.era, hair: r.hair };
+    if (!map[r.slug]) map[r.slug] = { name: r.name, base: Number(r.anchor), targets: [], notes: {}, eras: {}, hairs: {} };
     map[r.slug].targets.push(Number(r.target));
+    map[r.slug].notes[Number(r.target)] = r.youngNote || r.oldNote;
+    if (r.era)  map[r.slug].eras[Number(r.target)]  = r.era;
+    if (r.hair) map[r.slug].hairs[Number(r.target)] = r.hair;
   }
   return map;
 }
@@ -270,8 +273,8 @@ async function main() {
     const dataUri = args.dryRun ? null : `data:image/png;base64,${(await fs.readFile(canonical)).toString("base64")}`;
 
     for (const target of selectTargets(targets, args)) {
-      const note = target < base ? youngNote : oldNote;
-      const prompt = STYLE_PROMPT(variantIdentity(name, target, base, note, args.noLock, MAP[slug].era, MAP[slug].hair));
+      const note = (MAP[slug].notes && MAP[slug].notes[target]) || (target < base ? youngNote : oldNote);
+      const prompt = STYLE_PROMPT(variantIdentity(name, target, base, note, args.noLock, (MAP[slug].eras||{})[target], (MAP[slug].hairs||{})[target]));
       if (args.dryRun) {
         console.log(`── ${slug}  base ${base} → age ${target}  (${target < base ? "younger" : "older"}, source=canonical.png)`);
         console.log(`   ${prompt}\n`);
