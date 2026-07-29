@@ -152,6 +152,12 @@ for (const src of source) {
     "francis crick":     ["1916", "2004"],
     "joseph-michel montgolfier": ["1740", "1810"],
     "jack kilby":        ["1923", "2005"],  // source row carried INVENTION years (1958/1959)
+    // Verified against Wikidata 2026-07-29: 97/100 matched exactly. These three are
+    // genuinely uncertain in the historical record and sources differ, so they are
+    // marked approximate rather than silently asserted.
+    "al-khwarizmi":      ["c. 780", "c. 850"],   // Wikidata: c.750-846
+    "hypatia":           ["c. 350", "415"],      // birth disputed c.350-370; death certain
+
   };
   let bare = node.replace(/\s*\(.*$/, "").trim();
   // "Newcomen, Thomas" -> "Thomas Newcomen"; strip middle initials like "T.G."
