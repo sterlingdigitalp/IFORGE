@@ -99,6 +99,19 @@ const CUT = {
   "dennisritchie": "Cut — rank 98, trimmed to land on exactly 100",
 };
 // duo rows that resolved to a single person
+// Owner additions: the algorithm gave these a band rather than a discrete rank.
+// Midpoint used for ordering; the band is recorded on the row so it is not mistaken
+// for a precise rank.
+const BAND = {
+  "gregor mendel":            [17, "Top 15-20"],
+  "leonhard euler":           [17, "Top 15-20"],
+  "charles darwin":           [22, "Top 20-25"],
+  "carl friedrich gauss":     [27, "Top 25-30"],
+  "hippocrates":              [37, "Top 35-40"],
+  "andreas vesalius":         [42, "Top 40-45"],
+  "emmy noether":             [55, "Top 50-60"],
+  "george washington carver": [85, "Top 80-90"],
+};
 const DUO = {
   "noycekilby": "jackkilby", "fredericbantingcharlesbest": "frederickbanting",
   "frederickbantingcharlesbest": "frederickbanting",
@@ -173,13 +186,15 @@ for (const src of source) {
   }
   const fixed = hit && DATES[hit.name.toLowerCase()];
   if (fixed) { born = fixed[0]; died = fixed[1]; }
+  const band = hit && BAND[hit.name.toLowerCase()];
   out.push({
-    rank: /^\d+$/.test(rank) ? rank : "",
+    rank: band ? String(band[0]) : (/^\d+(\.\d+)?$/.test(rank) ? String(Math.round(+rank)) : ""),
+    rankNote: band ? `rank estimated from band ${band[1]}` : "",
     // The cast member's own name always wins. Source rows still carry duo labels
     // ("Noyce & Kilby") even where the cast resolved to one person.
     node, bare: hit ? hit.name : bare,
     in100: hit ? "YES" : "NO",
-    status: hit ? "" : (CUT[key] || "Not selected for the final 100"),
+    status: hit ? (band ? `rank estimated from band ${band[1]}` : "") : (CUT[key] || "Not selected for the final 100"),
     slug: hit?.slug || "", age: hit?.age ?? "", vars: hit?.vars.join(" ") ?? "",
     born, died,
     breakthrough: f[2] || "", hook: f[3] || "", arc: f[4] || "",
@@ -198,7 +213,10 @@ for (const c of Object.values(cast)) {
 const q = s => `"${String(s ?? "").replace(/"/g, '""')}"`;
 const HEAD = ["in_100","rank","character","slug","born","died","canonical_age","variant_ages","status_or_reason","breakthrough","title_and_hook","narrative_arc"];
 const csv = [HEAD.join(",")].concat(
-  out.sort((a, b) => (b.in100 === "YES") - (a.in100 === "YES") || a.bare.localeCompare(b.bare))
+  out.sort((a, b) =>
+       (b.in100 === "YES") - (a.in100 === "YES")
+    || ((+a.rank || 9e9) - (+b.rank || 9e9))
+    || a.bare.localeCompare(b.bare))
      .map(o => [o.in100, o.rank, o.bare, o.slug, o.born, o.died, o.age, o.vars, o.status, o.breakthrough, o.hook, o.arc].map(q).join(","))
 ).join("\n");
 

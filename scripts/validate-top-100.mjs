@@ -94,6 +94,16 @@ for (const r of inCast) {
 lifeBad.length ? bad(`${lifeBad.length} rows with an implausible lifespan`, lifeBad)
                : ok("every cast row has a birth year and a plausible lifespan");
 
+// ---- 6c. rank must be present and the file must be IN rank order.
+// It was alphabetised once, which discarded the ranking the whole list is built on.
+const noRank = inCast.filter(r => !r[col.rank]);
+noRank.length ? bad(`${noRank.length} cast rows have no rank`, noRank.map(r => r[col.character]))
+              : ok("every cast row carries a rank");
+const seq = inCast.map(r => +r[col.rank]);
+const ordered = seq.every((v, i) => i === 0 || v >= seq[i - 1]);
+ordered ? ok("file is in rank order, not alphabetical")
+        : bad("rows are not in rank order");
+
 // ---- 7. excluded rows all carry a reason
 const out = data.filter(r => r[col.in_100] === "NO");
 const noReason = out.filter(r => !r[col.status_or_reason]);
