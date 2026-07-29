@@ -28,3 +28,4 @@ tsconfig.tsbuildinfo
 
 # Delivery receipts — local log, absolute paths, regenerated each export
 characters/*/export/
+
