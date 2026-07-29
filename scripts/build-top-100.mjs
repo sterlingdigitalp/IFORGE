@@ -212,12 +212,21 @@ for (const c of Object.values(cast)) {
 
 const q = s => `"${String(s ?? "").replace(/"/g, '""')}"`;
 const HEAD = ["in_100","rank","character","slug","born","died","canonical_age","variant_ages","status_or_reason","breakthrough","title_and_hook","narrative_arc"];
+
+// Order: cast first, then by the source rank, ties alphabetical.
+out.sort((a, b) =>
+     (b.in100 === "YES") - (a.in100 === "YES")
+  || ((+a.rank || 9e9) - (+b.rank || 9e9))
+  || a.bare.localeCompare(b.bare));
+
+// Then renumber the cast 1..100. Source ranks carry ties (two figures shared a band)
+// and gaps (removed figures), which is useless as a list. Order is preserved exactly;
+// only the numbering is made contiguous. Excluded rows carry no rank — not in the list.
+let seq = 0;
+for (const o of out) o.rank = o.in100 === "YES" ? String(++seq) : "";
+
 const csv = [HEAD.join(",")].concat(
-  out.sort((a, b) =>
-       (b.in100 === "YES") - (a.in100 === "YES")
-    || ((+a.rank || 9e9) - (+b.rank || 9e9))
-    || a.bare.localeCompare(b.bare))
-     .map(o => [o.in100, o.rank, o.bare, o.slug, o.born, o.died, o.age, o.vars, o.status, o.breakthrough, o.hook, o.arc].map(q).join(","))
+  out.map(o => [o.in100, o.rank, o.bare, o.slug, o.born, o.died, o.age, o.vars, o.status, o.breakthrough, o.hook, o.arc].map(q).join(","))
 ).join("\n");
 
 await fs.writeFile(path.join(ROOT, "TOP 100.csv"), csv + "\n");

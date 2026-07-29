@@ -100,9 +100,10 @@ const noRank = inCast.filter(r => !r[col.rank]);
 noRank.length ? bad(`${noRank.length} cast rows have no rank`, noRank.map(r => r[col.character]))
               : ok("every cast row carries a rank");
 const seq = inCast.map(r => +r[col.rank]);
-const ordered = seq.every((v, i) => i === 0 || v >= seq[i - 1]);
-ordered ? ok("file is in rank order, not alphabetical")
-        : bad("rows are not in rank order");
+const contiguous = seq.every((v, i) => v === i + 1);
+contiguous ? ok("ranks are exactly 1..100 — in order, no duplicates, no gaps")
+           : bad(`ranks are not a clean 1..100 (min ${Math.min(...seq)}, max ${Math.max(...seq)}, ` +
+                 `${seq.length - new Set(seq).size} duplicate(s))`);
 
 // ---- 7. excluded rows all carry a reason
 const out = data.filter(r => r[col.in_100] === "NO");
