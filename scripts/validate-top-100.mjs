@@ -80,6 +80,20 @@ for (const r of inCast) {
 for (const [k, v] of Object.entries(mis))
   v.length ? bad(`${v.length} rows where '${k}' does not match its heading`, v) : ok(`'${k}' field content matches its heading in all 100 rows`);
 
+// ---- 6b. life dates must describe a plausible human life
+const yr = v => { const m = String(v).match(/(\d{3,4})/); if (!m) return null;
+  return /BCE/i.test(v) ? -(+m[1]) : +m[1]; };
+const lifeBad = [];
+for (const r of inCast) {
+  const b = yr(r[col.born]), d = yr(r[col.died]);
+  if (b === null) { lifeBad.push(`${r[col.character]}: no birth year`); continue; }
+  if (d === null) continue;                       // unknown death is acceptable
+  const span = d - b;
+  if (span < 15 || span > 110) lifeBad.push(`${r[col.character]}: ${r[col.born]}–${r[col.died]} = ${span}y`);
+}
+lifeBad.length ? bad(`${lifeBad.length} rows with an implausible lifespan`, lifeBad)
+               : ok("every cast row has a birth year and a plausible lifespan");
+
 // ---- 7. excluded rows all carry a reason
 const out = data.filter(r => r[col.in_100] === "NO");
 const noReason = out.filter(r => !r[col.status_or_reason]);
